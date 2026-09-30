@@ -1,0 +1,23 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+.vscode/
+TestResults/
+*.log
+publish/
+
+## Secrets / env
+.env
+appsettings.Development.local.json
+*.pfx
+
+## OS
+Thumbs.db
+.DS_Store
+
+## Bootstrap source maps (apenas depuração)
+src/OrderFlow.Web/wwwroot/lib/**/*.map
