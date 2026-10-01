@@ -18,4 +18,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\OrderFlow.Domain\OrderFlow.Domain.csproj" />
+    <ProjectReference Include="..\..\src\OrderFlow.Application\OrderFlow.Application.csproj" />
+  </ItemGroup>
+
 </Project>

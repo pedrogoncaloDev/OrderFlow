@@ -10,4 +10,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OrderFlow.Infrastructure\OrderFlow.Infrastructure.csproj" />
+    <ProjectReference Include="..\OrderFlow.Contracts\OrderFlow.Contracts.csproj" />
+  </ItemGroup>
 </Project>
