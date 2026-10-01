@@ -1,23 +1,61 @@
+using DotNetEnv;
+using Microsoft.EntityFrameworkCore;
+using OrderFlow.Infrastructure.Persistence;
+
+Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+await app.ApplyMigrationsAsync();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+
+static class StartupExtensions
+{
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("Default")
+            ?? BuildConnectionStringFromEnv();
+
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
+
+        return services;
+    }
+
+    public static async Task ApplyMigrationsAsync(this WebApplication app)
+    {
+        if (!app.Configuration.GetValue<bool>("Database:AutoMigrate"))
+            return;
+
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.MigrateAsync();
+    }
+
+    private static string BuildConnectionStringFromEnv() =>
+        $"Host=localhost;Port={RequireEnv("POSTGRES_PORT")};" +
+        $"Database={RequireEnv("POSTGRES_DB")};" +
+        $"Username={RequireEnv("POSTGRES_USER")};" +
+        $"Password={RequireEnv("POSTGRES_PASSWORD")}";
+
+    private static string RequireEnv(string name) =>
+        Environment.GetEnvironmentVariable(name)
+        ?? throw new InvalidOperationException(
+            $"Variável de ambiente '{name}' não definida. Crie o .env a partir do .env.example.");
+}
