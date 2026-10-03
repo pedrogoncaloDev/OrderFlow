@@ -64,7 +64,7 @@ Worker → Infrastructure + Contracts      Web → (nada por enquanto; falará c
 ## Convenções
 - **Idioma**: commits, comentários, mensagens de erro e documentação em **português (pt-BR)**; identificadores de código em inglês.
 - **Commits**: Conventional Commits em português — `feat:`, `fix:`, `test:`, `refactor:`, `docs:`, `chore:`.
-- **Git**: branch por funcionalidade (`feat/nome-da-feature`), PR para `main`. Não commite direto em `main`.
+- **Git**: branch por funcionalidade (`feat/feature-name`), PR para `main`. **Nomes de branch sempre em inglês**, em kebab-case, com o prefixo do tipo (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `chore/`); ex.: `feat/change-password`. Não commite direto em `main`.
 - **Formatação** (`.editorconfig`): UTF-8, **LF**, 4 espaços em C#, 2 espaços em `yml/json/md/csproj`, newline final, sem espaços no fim da linha. Não use tabs. (`*.sln` é CRLF por `.gitattributes`.)
 - **Banco**: tabelas e colunas em snake_case (convention); enums persistidos como **texto** (`HasConversion<string>()`); valores monetários com `HasPrecision(18, 2)`; chaves `Guid` geradas na aplicação (`ValueGeneratedNever`); datas em UTC (`DateTime.UtcNow`).
 - **Exclusão**: cliente com pedidos e produto já vendido não podem ser apagados (`Restrict`); apagar pedido apaga itens (`Cascade`); apagar cliente zera `users.customer_id` (`SetNull`). Mantenha essas regras ao evoluir o modelo.
