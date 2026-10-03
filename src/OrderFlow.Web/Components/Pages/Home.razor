@@ -1,7 +1,127 @@
-﻿@page "/"
+@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>OrderFlow</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    <Authorized>
+        <header class="page-header">
+            <span class="hero-eyebrow">Painel</span>
+            <h1 class="page-title">Olá, @DisplayName(context.User.Identity?.Name)</h1>
+            <p class="page-subtitle">Você está conectado como <strong>@context.User.Identity?.Name</strong>.</p>
+        </header>
 
-Welcome to your new app.
+        <section class="feature-grid" aria-label="Módulos">
+            <article class="feature-card">
+                <span class="badge-soon">Em breve</span>
+                <h2>Pedidos</h2>
+                <p>Crie pedidos, acompanhe o status e consulte o histórico de cada cliente.</p>
+            </article>
+            <article class="feature-card">
+                <span class="badge-soon">Em breve</span>
+                <h2>Clientes</h2>
+                <p>Cadastro de clientes vinculados às contas de acesso.</p>
+            </article>
+            <article class="feature-card">
+                <span class="badge-soon">Em breve</span>
+                <h2>Produtos</h2>
+                <p>Catálogo com preço e controle de estoque.</p>
+            </article>
+        </section>
+
+        <p class="mt-4"><a class="btn btn-ghost" href="perfil">Ver meu perfil</a></p>
+    </Authorized>
+
+    <NotAuthorized>
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="hero-eyebrow">Gestão de pedidos</span>
+                <h1 class="hero-title">Seus pedidos, <em>organizados</em> de ponta a ponta.</h1>
+                <p class="hero-lead">
+                    O OrderFlow reúne clientes, produtos e pedidos em um só lugar, com controle de estoque
+                    e o status de cada venda sempre à vista. Crie sua conta e comece em minutos.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-brand btn-lg" href="register">Criar conta</a>
+                    <a class="btn btn-ghost btn-lg" href="login">Entrar</a>
+                </div>
+            </div>
+
+            <div class="hero-visual" aria-hidden="true">
+                <div class="mock-stack">
+                    <div class="mock-back"></div>
+                    <div class="mock-card">
+                        <div class="mock-head">
+                            <div>
+                                <span class="mock-label">Pedido</span>
+                                <strong>#1042</strong>
+                            </div>
+                            <span class="mock-status">Confirmado</span>
+                        </div>
+
+                        <div class="mock-customer">
+                            <span class="mock-avatar">M</span>
+                            <div>
+                                <strong>Maria Souza</strong>
+                                <small>maria@exemplo.com</small>
+                            </div>
+                        </div>
+
+                        <ul class="mock-items">
+                            <li><span>Camiseta básica <em>× 2</em></span><span>R$ 79,80</span></li>
+                            <li><span>Boné aba reta <em>× 1</em></span><span>R$ 59,90</span></li>
+                        </ul>
+
+                        <div class="mock-total">
+                            <span>Total</span>
+                            <strong>R$ 139,70</strong>
+                        </div>
+
+                        <div class="mock-steps">
+                            <span class="mock-step">Pendente</span>
+                            <span class="mock-step-line"></span>
+                            <span class="mock-step mock-step-done">Confirmado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="feature-grid" aria-label="Recursos">
+            <article class="feature-card">
+                <h2>Pedidos sem retrabalho</h2>
+                <p>Registre pedidos com vários itens. O preço fica registrado no momento da compra e o total é calculado para você.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Estoque sob controle</h2>
+                <p>Veja a quantidade disponível de cada produto e evite vender o que não tem.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Status em cada etapa</h2>
+                <p>Do pendente ao confirmado, saiba em que ponto está cada pedido.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Acesso seguro</h2>
+                <p>Senhas protegidas e sessão com token: cada pessoa vê só o que é dela.</p>
+            </article>
+        </section>
+    </NotAuthorized>
+
+    <Authorizing>
+        <div class="card-panel" aria-busy="true">
+            <div class="skeleton skeleton-line w-50"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line w-75"></div>
+        </div>
+    </Authorizing>
+</AuthorizeView>
+
+@code {
+    private static string DisplayName(string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return "bem-vindo";
+
+        var name = email.Split('@')[0];
+        return name.Length == 0 ? email : char.ToUpperInvariant(name[0]) + name[1..];
+    }
+}

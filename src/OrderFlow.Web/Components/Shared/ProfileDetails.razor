@@ -1,0 +1,99 @@
+@inject AuthApiClient Api
+@inject JwtAuthenticationStateProvider Auth
+@inject NavigationManager Navigation
+
+<header class="page-header">
+    <h1 class="page-title">Meu perfil</h1>
+    <p class="page-subtitle">Dados da sua conta, lidos da API com o seu token de acesso.</p>
+</header>
+
+@if (_loading)
+{
+    <div class="card-panel" aria-busy="true">
+        <div class="skeleton skeleton-line w-50"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line w-75"></div>
+    </div>
+}
+else if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+else if (_user is not null)
+{
+    <section class="card-panel profile">
+        <div class="profile-avatar" aria-hidden="true">@Initial(_user.Email)</div>
+
+        <dl class="profile-list">
+            <div>
+                <dt>E-mail</dt>
+                <dd>@_user.Email</dd>
+            </div>
+            <div>
+                <dt>Perfil de acesso</dt>
+                <dd><span class="badge-role">@RoleLabel(_user.Role)</span></dd>
+            </div>
+            <div>
+                <dt>Conta criada em</dt>
+                <dd>@FormatUtc(_user.CreatedAt)</dd>
+            </div>
+            <div>
+                <dt>Sessão expira em</dt>
+                <dd>@(Auth.SessionExpiresAtUtc is { } expires ? FormatUtc(expires) : "—")</dd>
+            </div>
+            <div>
+                <dt>Identificador</dt>
+                <dd><code>@_user.Id</code></dd>
+            </div>
+        </dl>
+    </section>
+}
+
+@code {
+    private UserInfo? _user;
+    private bool _loading = true;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await Auth.GetAccessTokenAsync();
+        if (token is null)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        var result = await Api.GetMeAsync(token);
+
+        if (result.IsUnauthorized)
+        {
+            // Token recusado pela API (expirado ou chave trocada): encerra a sessão local.
+            await Auth.SignOutAsync();
+            RedirectToLogin();
+            return;
+        }
+
+        if (result.Succeeded)
+            _user = result.Value;
+        else
+            _error = result.Error;
+
+        _loading = false;
+    }
+
+    private void RedirectToLogin() =>
+        Navigation.NavigateTo("login?returnUrl=%2Fperfil", replace: true);
+
+    private static string Initial(string email) =>
+        string.IsNullOrEmpty(email) ? "?" : email[..1].ToUpperInvariant();
+
+    private static string RoleLabel(string role) => role switch
+    {
+        "Admin" => "Administrador",
+        "Customer" => "Cliente",
+        _ => role
+    };
+
+    private static string FormatUtc(DateTime value) =>
+        value.ToUniversalTime().ToString("dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+}

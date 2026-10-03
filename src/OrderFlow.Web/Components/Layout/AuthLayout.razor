@@ -1,0 +1,49 @@
+@inherits LayoutComponentBase
+@inject JwtAuthenticationStateProvider Auth
+@inject NavigationManager Navigation
+
+<div class="auth-shell">
+    <aside class="auth-aside">
+        <a class="brand brand-light" href="">
+            <BrandMark />
+            <span>OrderFlow</span>
+        </a>
+
+        <div class="auth-aside-copy">
+            <h2>Pedidos sob controle, do pedido à confirmação.</h2>
+            <p>Clientes, produtos e pedidos em um só lugar, com controle de estoque e o status de cada venda à vista.</p>
+
+            <div class="flow-demo" aria-hidden="true">
+                <span class="flow-pill">Pendente</span>
+                <span class="flow-line"></span>
+                <span class="flow-pill flow-pill-done">Confirmado</span>
+            </div>
+        </div>
+
+        <small class="auth-aside-foot">© @DateTime.UtcNow.Year OrderFlow. Todos os direitos reservados.</small>
+    </aside>
+
+    <section class="auth-panel">
+        <a class="brand auth-mobile-brand" href="">
+            <BrandMark />
+            <span>OrderFlow</span>
+        </a>
+
+        <div class="auth-card">
+            @Body
+        </div>
+    </section>
+</div>
+
+<BlazorErrorUi />
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Quem já está logado não precisa ver as telas de login e cadastro.
+        var state = await Auth.GetAuthenticationStateAsync();
+
+        if (state.User.Identity?.IsAuthenticated == true)
+            Navigation.NavigateTo("", replace: true);
+    }
+}

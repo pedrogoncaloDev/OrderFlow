@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
+using OrderFlow.Api.Extensions;
 using OrderFlow.Infrastructure.Persistence;
 
 Env.TraversePath().Load();
@@ -7,6 +8,7 @@ Env.TraversePath().Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDatabase(builder.Configuration);
+builder.Services.AddJwtAuth(builder.Configuration, builder.Environment);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -20,6 +22,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

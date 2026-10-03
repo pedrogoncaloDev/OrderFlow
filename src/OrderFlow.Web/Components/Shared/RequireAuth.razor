@@ -1,0 +1,21 @@
+@* Envolve conteúdo que só usuários autenticados podem ver; os demais vão para o login. *@
+
+<AuthorizeView>
+    <Authorized>
+        @ChildContent
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToLogin />
+    </NotAuthorized>
+    <Authorizing>
+        <div class="card-panel" aria-busy="true">
+            <div class="skeleton skeleton-line w-50"></div>
+            <div class="skeleton skeleton-line"></div>
+            <div class="skeleton skeleton-line w-75"></div>
+        </div>
+    </Authorizing>
+</AuthorizeView>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

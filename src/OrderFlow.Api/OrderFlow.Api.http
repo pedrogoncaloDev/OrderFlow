@@ -1,0 +1,24 @@
+@host = http://localhost:5222
+
+### Cadastro (devolve 201 com o token)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "maria@exemplo.com",
+  "password": "senha1234"
+}
+
+### Login (devolve 200 com o token)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "maria@exemplo.com",
+  "password": "senha1234"
+}
+
+### Perfil (cole o accessToken retornado acima)
+@token = COLE_O_TOKEN_AQUI
+GET {{host}}/api/auth/me
+Authorization: Bearer {{token}}
