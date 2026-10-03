@@ -1,0 +1,73 @@
+@page "/register"
+@layout AuthLayout
+@inject AuthApiClient Api
+@inject JwtAuthenticationStateProvider Auth
+@inject NavigationManager Navigation
+
+<PageTitle>Criar conta · OrderFlow</PageTitle>
+
+<h1 class="auth-title">Crie sua conta</h1>
+<p class="auth-subtitle">Leva menos de um minuto. Você já entra logado.</p>
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+
+<EditForm Model="_model" OnValidSubmit="SubmitAsync" novalidate>
+    <DataAnnotationsValidator />
+
+    <FormField Id="register-email"
+               Label="E-mail"
+               Type="email"
+               Autocomplete="email"
+               Placeholder='@("voce@exemplo.com")'
+               Disabled="_submitting"
+               @bind-Value="_model.Email" />
+
+    <FormField Id="register-password"
+               Label="Senha"
+               Type="password"
+               Autocomplete="new-password"
+               Hint="Mínimo de 8 caracteres, com letras e números."
+               Disabled="_submitting"
+               @bind-Value="_model.Password" />
+
+    <FormField Id="register-confirm"
+               Label="Confirmar senha"
+               Type="password"
+               Autocomplete="new-password"
+               Disabled="_submitting"
+               @bind-Value="_model.ConfirmPassword" />
+
+    <button type="submit" class="btn btn-brand w-100 mt-2" disabled="@_submitting">
+        @(_submitting ? "Criando conta..." : "Criar conta")
+    </button>
+</EditForm>
+
+<p class="auth-switch">Já tem conta? <a href="login">Entrar</a></p>
+
+@code {
+    private readonly RegisterModel _model = new();
+    private bool _submitting;
+    private string? _error;
+
+    private async Task SubmitAsync()
+    {
+        _submitting = true;
+        _error = null;
+
+        var result = await Api.RegisterAsync(_model);
+
+        if (!result.Succeeded)
+        {
+            _error = result.Error;
+            _submitting = false;
+            return;
+        }
+
+        // A API já devolve o token no cadastro: o usuário entra direto, sem precisar logar de novo.
+        await Auth.SignInAsync(result.Value!);
+        Navigation.NavigateTo("");
+    }
+}

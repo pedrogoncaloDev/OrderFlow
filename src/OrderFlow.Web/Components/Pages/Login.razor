@@ -1,0 +1,80 @@
+@page "/login"
+@layout AuthLayout
+@inject AuthApiClient Api
+@inject JwtAuthenticationStateProvider Auth
+@inject NavigationManager Navigation
+
+<PageTitle>Entrar · OrderFlow</PageTitle>
+
+<h1 class="auth-title">Bem-vindo de volta</h1>
+<p class="auth-subtitle">Entre com seu e-mail e senha para acessar o OrderFlow.</p>
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+
+<EditForm Model="_model" OnValidSubmit="SubmitAsync" novalidate>
+    <DataAnnotationsValidator />
+
+    <FormField Id="login-email"
+               Label="E-mail"
+               Type="email"
+               Autocomplete="email"
+               Placeholder='@("voce@exemplo.com")'
+               Disabled="_submitting"
+               @bind-Value="_model.Email" />
+
+    <FormField Id="login-password"
+               Label="Senha"
+               Type="password"
+               Autocomplete="current-password"
+               Disabled="_submitting"
+               @bind-Value="_model.Password" />
+
+    <button type="submit" class="btn btn-brand w-100 mt-2" disabled="@_submitting">
+        @(_submitting ? "Entrando..." : "Entrar")
+    </button>
+</EditForm>
+
+<p class="auth-switch">Ainda não tem conta? <a href="register">Criar conta</a></p>
+
+@code {
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? ReturnUrl { get; set; }
+
+    private readonly LoginModel _model = new();
+    private bool _submitting;
+    private string? _error;
+
+    private async Task SubmitAsync()
+    {
+        _submitting = true;
+        _error = null;
+
+        var result = await Api.LoginAsync(_model);
+
+        if (!result.Succeeded)
+        {
+            _error = result.Error;
+            _model.Password = string.Empty;
+            _submitting = false;
+            return;
+        }
+
+        await Auth.SignInAsync(result.Value!);
+        Navigation.NavigateTo(SafeReturnUrl());
+    }
+
+    // Só aceita caminhos internos do próprio site, para ninguém usar o login para redirecionar a sites externos.
+    private string SafeReturnUrl()
+    {
+        var url = ReturnUrl;
+
+        var isLocal = !string.IsNullOrEmpty(url)
+            && url[0] == '/'
+            && (url.Length == 1 || (url[1] != '/' && url[1] != '\\'));
+
+        return isLocal ? url! : "/";
+    }
+}

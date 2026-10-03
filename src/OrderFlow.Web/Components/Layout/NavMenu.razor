@@ -1,30 +1,49 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">OrderFlow.Web</a>
+@inject JwtAuthenticationStateProvider Auth
+@inject NavigationManager Navigation
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="">
+            <BrandMark />
+            <span>OrderFlow</span>
+        </a>
+
+        <nav class="topbar-nav" aria-label="Navegação principal">
+            <NavLink class="topbar-link" href="" Match="NavLinkMatch.All">Início</NavLink>
+            <AuthorizeView>
+                <Authorized>
+                    <NavLink class="topbar-link" href="perfil">Meu perfil</NavLink>
+                </Authorized>
+            </AuthorizeView>
+        </nav>
+
+        <div class="topbar-actions">
+            <AuthorizeView>
+                <Authorized>
+                    <span class="user-chip" title="@context.User.Identity?.Name">
+                        <span class="user-chip-avatar" aria-hidden="true">@Initial(context.User.Identity?.Name)</span>
+                        <span class="user-chip-email">@context.User.Identity?.Name</span>
+                    </span>
+                    <button type="button" class="btn btn-ghost btn-sm" @onclick="SignOutAsync">Sair</button>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="btn btn-ghost btn-sm" href="login">Entrar</a>
+                    <a class="btn btn-brand btn-sm" href="register">Criar conta</a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
     </div>
-</div>
+</header>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+@code {
+    private async Task SignOutAsync()
+    {
+        await Auth.SignOutAsync();
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+        // Recarrega a página inicial para começar do zero, sem sobras da sessão encerrada.
+        Navigation.NavigateTo("", forceLoad: true);
+    }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
+    private static string Initial(string? name) =>
+        string.IsNullOrEmpty(name) ? "?" : name[..1].ToUpperInvariant();
+}
