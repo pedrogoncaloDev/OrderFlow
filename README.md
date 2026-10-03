@@ -41,6 +41,15 @@ docker compose up -d
 - RabbitMQ Management: http://localhost:15672 (credenciais do `.env`)
 - PostgreSQL: `localhost:5432` (credenciais do `.env`)
 
+Depois, rode a API e o front-end (em dois terminais):
+
+```bash
+dotnet run --project src/OrderFlow.Api --launch-profile http   # http://localhost:5222
+dotnet run --project src/OrderFlow.Web                          # http://localhost:5021
+```
+
+Cadastro, login e perfil já funcionam. Veja o [guia de estudo da autenticação](docs/guia-autenticacao.md).
+
 ## Roadmap
 
 - [ ] **v0.1**: API + banco + JWT
