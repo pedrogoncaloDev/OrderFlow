@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Identity;
-using OrderFlow.Application.Auth;
 
 namespace OrderFlow.Infrastructure.Auth;
 
 /// <summary>
 /// Hash de senha com o PasswordHasher do ASP.NET Core Identity (PBKDF2 com salt aleatório por senha).
 /// </summary>
-public sealed class IdentityPasswordHasher : Application.Auth.IPasswordHasher
+public sealed class IdentityPasswordHasher
 {
     // O hasher padrão não usa o objeto "usuário"; um sentinela evita acoplar este código ao Domain.
     private static readonly object Subject = new();
