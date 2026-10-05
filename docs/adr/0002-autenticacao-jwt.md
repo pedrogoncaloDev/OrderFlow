@@ -1,6 +1,6 @@
 # ADR 0002: Autenticação com JWT (API) e sessão no Blazor Server
 
-**Status:** Aceita
+**Status:** Aceita (a estrutura em camadas descrita abaixo foi substituída pelo ADR 0003)
 
 ## Contexto
 O sistema precisa de cadastro e login de usuários. A API é consumida pelo front-end Blazor e, no futuro, por outros clientes. A entidade `User` já existia (e-mail único, `PasswordHash`, `Role`).

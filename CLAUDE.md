@@ -7,7 +7,7 @@ OrderFlow: sistema de pedidos em **.NET 9** (projeto de portfólio) com API REST
 
 ## Stack
 - **.NET 9** (`net9.0`, `Nullable` e `ImplicitUsings` habilitados em todos os projetos).
-- **API**: ASP.NET Core Web API com Controllers + OpenAPI (`Microsoft.AspNetCore.OpenApi`). Autenticação JWT implementada (`/api/auth/register`, `/login`, `/me`; ver ADR 0002). Swagger UI ainda não.
+- **API**: ASP.NET Core Web API com Controllers + OpenAPI (`Microsoft.AspNetCore.OpenApi`). Autenticação JWT implementada (`/api/auth/register`, `/login`, `/me`; ver ADR 0002 e ADR 0003: a lógica fica direto no `AuthController`, sem serviço nem repositório). Swagger UI ainda não.
 - **Banco**: PostgreSQL 15 via EF Core 9 + `Npgsql.EntityFrameworkCore.PostgreSQL` + `EFCore.NamingConventions` (snake_case).
 - **Mensageria**: RabbitMQ 3 (management) — subido no Docker, ainda sem código de publicação/consumo.
 - **Web**: Blazor (Razor Components, render mode Interactive Server).
@@ -80,6 +80,7 @@ Worker → Infrastructure + Contracts      Web → (nada por enquanto; falará c
 
 ## Armadilhas conhecidas (detalhes em CONTEXT.md)
 - Só existe o `AuthController`; os controllers de produtos, clientes e pedidos ainda não existem.
+- O auth não tem camadas intermediárias (ADR 0003): a lógica está no `AuthController` com o `AppDbContext`, e os corpos (`RegisterRequest`, `LoginRequest`) ficam no mesmo arquivo. Não há testes do auth até existirem testes de integração. Em recursos novos, decida caso a caso se vale extrair um serviço.
 - A chave do JWT vem de `Jwt__Key` (`.env`). Em Development, se vazia, a API gera uma chave temporária (sessões caem ao reiniciar); fora dele, a API não sobe sem a chave.
 - A connection string montada a partir do `.env` usa `Host=localhost` fixo; para API em container será preciso configurar `ConnectionStrings:Default`.
 - Os blocos `api`, `worker` e `web` do `docker-compose.yml` estão comentados e os Dockerfiles ainda não existem.

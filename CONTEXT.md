@@ -1,7 +1,7 @@
 # CONTEXT.md — Contexto do projeto OrderFlow
 
 > Instruções operacionais (comandos, convenções, regras) estão em `CLAUDE.md`. Este arquivo explica **o quê** e **por quê**, e o estado atual.
-> Última atualização: 2026-10-03 (branch `main`, após o merge do PR #1).
+> Última atualização: 2026-10-04 (branch `refactor/simplify-auth`, a partir da `main`).
 
 ## 1. Visão do produto
 **OrderFlow** é um sistema de pedidos com **API REST**, **mensageria** e **front-end Blazor**, feito em .NET. É um **projeto de portfólio**: o objetivo é demonstrar uma arquitetura em camadas, EF Core com migrations automáticas, autenticação JWT, um worker consumindo eventos via RabbitMQ e uma interface web.
@@ -23,7 +23,7 @@ Monorepo (ADR 0001): um único `docker compose up` deve subir o sistema inteiro,
 OrderFlow/
 ├── src/
 │   ├── OrderFlow.Domain          entidades e enums (sem dependências)
-│   ├── OrderFlow.Application     casos de uso, validações, DTOs (vazio por enquanto)
+│   ├── OrderFlow.Application     casos de uso, validações, DTOs (hoje só `AuthClaimTypes` e `PasswordPolicy`)
 │   ├── OrderFlow.Infrastructure  EF Core: AppDbContext, Configurations, Migrations
 │   ├── OrderFlow.Contracts       eventos/contratos compartilhados (vazio por enquanto)
 │   ├── OrderFlow.Api             Web API (composition root)
@@ -66,15 +66,15 @@ Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo
 - CI de build/test; `.editorconfig`/`.gitattributes`; ADR do monorepo.
 - Startup da API com carregamento de `.env`, DbContext e auto-migrate.
 
-- Cadastro, login e `/api/auth/me` com JWT e hash de senha (Application: `AuthService`; Infrastructure: repositório, hasher, gerador de token; Api: `AuthController`). Ver ADR 0002 e `docs/guia-autenticacao.md`.
+- Cadastro, login e `/api/auth/me` com JWT e hash de senha (tudo no `AuthController`, que usa o `AppDbContext`, o `IdentityPasswordHasher` e o `JwtTokenGenerator`; sem serviço, repositório ou interfaces). Ver ADR 0002, ADR 0003 e `docs/guia-autenticacao.md`.
 - Front-end Blazor com login, cadastro, página de perfil protegida e layout (sem Counter/Weather).
-- Testes unitários do `AuthService` (`tests/OrderFlow.UnitTests/Auth`).
 
 **Ainda não existe**
 - Controllers/endpoints, DTOs, validações, casos de uso (Application está vazio).
 - Publicação de eventos e consumo no Worker; `Contracts` vazio; nenhum pacote de RabbitMQ referenciado.
 - Dockerfiles e serviços `api`/`worker`/`web` no compose (estão comentados).
 - Testes reais (apenas `UnitTest1` vazio) — a CI passa, mas sem cobertura.
+- Testes do auth: os unitários do `AuthService` foram removidos junto com o serviço (ADR 0003); falta cobrir `/api/auth/*` com testes de integração.
 - Seed de dados; paginação; tratamento global de erros (ProblemDetails).
 
 ## 7. Roadmap (do README)
@@ -97,7 +97,7 @@ Initial commit → estrutura inicial de pastas → remoção dos `Class1.cs` de 
 - Sem índices em `orders.customer_id`/`status` e `order_items.order_id/product_id` além dos criados por convenção do EF para FKs — revisar conforme consultas reais.
 - O `Program.cs` do Worker ainda é template. No Web, `Counter`/`Weather` foram removidos.
 - Autenticação sem refresh token, sem bloqueio por tentativas e sem confirmação de e-mail (ver ADR 0002).
-- Código de autenticação escrito sem `dotnet build`/`dotnet test` no ambiente (SDK indisponível): rodar ambos antes de commitar.
+- Código de autenticação (e a simplificação do ADR 0003) escrito sem `dotnet build`/`dotnet test` no ambiente (SDK indisponível): rodar ambos antes de commitar.
 - `.csproj` de Application/Domain/Infrastructure/Contracts e os `UnitTest1.cs` têm BOM UTF-8; `.editorconfig` define `charset = utf-8` (sem BOM). Padronizar.
 - `StartupExtensions` está definido dentro de `Program.cs` da API; ao crescer, mover para arquivos próprios (`Extensions/`).
 - Não consegui rodar `dotnet build`/`dotnet test` ao montar estes documentos (SDK indisponível no ambiente), então o estado de build é inferido da leitura do código.
