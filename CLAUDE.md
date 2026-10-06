@@ -83,7 +83,7 @@ Worker → Infrastructure + Contracts      Web → (nada por enquanto; falará c
 - O auth não tem camadas intermediárias (ADR 0003): a lógica está no `AuthController` com o `AppDbContext`, e os corpos (`RegisterRequest`, `LoginRequest`) ficam no mesmo arquivo. Não há testes do auth até existirem testes de integração. Em recursos novos, decida caso a caso se vale extrair um serviço.
 - A chave do JWT vem de `Jwt__Key` (`.env`). Em Development, se vazia, a API gera uma chave temporária (sessões caem ao reiniciar); fora dele, a API não sobe sem a chave.
 - A connection string montada a partir do `.env` usa `Host=localhost` fixo; para API em container será preciso configurar `ConnectionStrings:Default`.
-- Os blocos `api`, `worker` e `web` do `docker-compose.yml` estão comentados e os Dockerfiles ainda não existem.
+- Há Dockerfiles para a Api e o Web (contexto de build = raiz do repo; ver `docs/deploy.md`); o Worker ainda não tem, e os blocos `api`, `worker` e `web` do `docker-compose.yml` seguem comentados.
 - `OrderFlow.Web` tem login, cadastro, perfil e layout próprios. Roda em modo interativo **sem pré-renderização** (o token fica no navegador); não use `[Authorize]` nas páginas, use `<RequireAuth>`.
 - `.vs/` existe no disco (Visual Studio) mas está no `.gitignore`; ignore-o em buscas.
 

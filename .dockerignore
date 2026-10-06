@@ -1,0 +1,23 @@
+# Contexto de build dos Dockerfiles (raiz do repositório): fica de fora tudo que não entra na imagem.
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+.git/
+.github/
+.idea/
+.vscode/
+tests/
+docs/
+TestResults/
+
+# Segredos e arquivos locais: nunca entram na imagem.
+.env
+.env.*
+!.env.example
+appsettings.Development.local.json
+*.pfx
+
+docker-compose.yml
+**/Dockerfile
+.dockerignore
