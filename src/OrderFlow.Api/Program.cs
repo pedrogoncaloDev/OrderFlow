@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDatabase(builder.Configuration);
 builder.Services.AddJwtAuth(builder.Configuration, builder.Environment);
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks(); // só "o processo está de pé"; não consulta o banco (não acorda o Neon)
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -25,6 +26,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
 
