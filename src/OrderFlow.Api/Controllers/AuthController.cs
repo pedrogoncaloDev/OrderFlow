@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using OrderFlow.Api.Models.Auth;
 using OrderFlow.Application.Auth;
 using OrderFlow.Domain.Entities;
 using OrderFlow.Domain.Enums;
@@ -19,6 +19,14 @@ public class AuthController : ControllerBase
     private readonly IdentityPasswordHasher _passwordHasher;
     private readonly JwtTokenGenerator _tokenGenerator;
 
+    // O hash da senha nunca sai daqui: UserResponse só expõe os dados públicos.
+    private AuthResponse BuildAuthResponse(User user)
+    {
+        var (token, expiresAtUtc) = _tokenGenerator.Generate(user);
+
+        return new AuthResponse(token, expiresAtUtc, UserResponse.From(user));
+    }
+
     // Construtor
     public AuthController(AppDbContext db, IdentityPasswordHasher passwordHasher, JwtTokenGenerator tokenGenerator)
     {
@@ -30,14 +38,14 @@ public class AuthController : ControllerBase
     /// <summary>Cria uma conta de cliente e já devolve o token de acesso.</summary>
     [HttpPost("register")]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Register(RegisterRequest request, CancellationToken cancellationToken)
     {
         var user = new User
         {
-            Email = NormalizeEmail(request.Email),
+            Email = EmailNormalizer.Normalize(request.Email),
             PasswordHash = _passwordHasher.Hash(request.Password),
             Role = UserRole.Customer // o papel é sempre definido no servidor, nunca vem do cliente
         };
@@ -63,12 +71,12 @@ public class AuthController : ControllerBase
     /// <summary>Autentica com e-mail e senha e devolve o token de acesso.</summary>
     [HttpPost("login")]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<AuthResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login(LoginRequest request, CancellationToken cancellationToken)
     {
-        var email = NormalizeEmail(request.Email);
+        var email = EmailNormalizer.Normalize(request.Email);
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
         // Mesma resposta para "usuário não existe" e "senha errada", para não revelar quais e-mails têm conta.
@@ -86,7 +94,7 @@ public class AuthController : ControllerBase
     /// <summary>Retorna os dados do usuário dono do token.</summary>
     [HttpGet("me")]
     [Authorize]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<UserResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Me(CancellationToken cancellationToken)
     {
@@ -97,46 +105,42 @@ public class AuthController : ControllerBase
 
         var user = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
-        return user is null ? Unauthorized() : Ok(ToUserResponse(user));
+        return user is null ? Unauthorized() : Ok(UserResponse.From(user));
     }
 
-    // Resposta de cadastro e login: { accessToken, expiresAtUtc, user }. O hash da senha nunca sai daqui.
-    private object BuildAuthResponse(User user)
+    /// <summary>Muda a senha do usuário.</summary>
+    [HttpPost("change_password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request, CancellationToken cancellationToken)
     {
-        var (token, expiresAtUtc) = _tokenGenerator.Generate(user);
+        // Quem é o dono do token (já validado pelo middleware).
+        if (!Guid.TryParse(User.FindFirst(AuthClaimTypes.Subject)?.Value, out var userId))
+            return Unauthorized();
 
-        return new { AccessToken = token, ExpiresAtUtc = expiresAtUtc, User = ToUserResponse(user) };
+        // Tracking ligado: vamos alterar e salvar.
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user is null)
+            return Unauthorized();
+
+        // Confere a senha atual.
+        if (!_passwordHasher.Verify(user.PasswordHash, request.old_password))
+        {
+            ModelState.AddModelError(nameof(request.old_password), "A senha atual está incorreta.");
+            return ValidationProblem(ModelState);
+        }
+
+        if (request.old_password == request.new_password)
+        {
+            ModelState.AddModelError(nameof(request.new_password), "A nova senha deve ser diferente da atual.");
+            return ValidationProblem(ModelState);
+        }
+
+        user.PasswordHash = _passwordHasher.Hash(request.new_password);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return NoContent();
     }
-
-    private static object ToUserResponse(User user) =>
-        new { user.Id, user.Email, Role = user.Role.ToString(), user.CreatedAt };
-
-    private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();
-}
-
-/// <summary>Corpo de POST /api/auth/register.</summary>
-public sealed class RegisterRequest
-{
-    [Required(ErrorMessage = "Informe o e-mail.")]
-    [EmailAddress(ErrorMessage = "Informe um e-mail válido.")]
-    [StringLength(320, ErrorMessage = "O e-mail deve ter no máximo 320 caracteres.")]
-    public string Email { get; init; } = string.Empty;
-
-    [Required(ErrorMessage = "Informe a senha.")]
-    [StringLength(PasswordPolicy.MaxLength, MinimumLength = PasswordPolicy.MinLength,
-        ErrorMessage = "A senha deve ter entre 8 e 100 caracteres.")]
-    [RegularExpression(PasswordPolicy.Pattern, ErrorMessage = "A senha deve conter letras e números.")]
-    public string Password { get; init; } = string.Empty;
-}
-
-/// <summary>Corpo de POST /api/auth/login.</summary>
-public sealed class LoginRequest
-{
-    [Required(ErrorMessage = "Informe o e-mail.")]
-    [StringLength(320, ErrorMessage = "O e-mail deve ter no máximo 320 caracteres.")]
-    public string Email { get; init; } = string.Empty;
-
-    [Required(ErrorMessage = "Informe a senha.")]
-    [StringLength(PasswordPolicy.MaxLength, ErrorMessage = "A senha deve ter no máximo 100 caracteres.")]
-    public string Password { get; init; } = string.Empty;
 }

@@ -22,3 +22,13 @@ Content-Type: application/json
 @token = COLE_O_TOKEN_AQUI
 GET {{host}}/api/auth/me
 Authorization: Bearer {{token}}
+
+### Trocar a senha (cole o accessToken do login; corpo em snake_case)
+POST {{host}}/api/auth/change_password
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "old_password": "senha1234",
+  "new_password": "novaSenha99"
+}
