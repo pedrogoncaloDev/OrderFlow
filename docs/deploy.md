@@ -15,6 +15,14 @@ docker build -f src/OrderFlow.Web/Dockerfile -t orderflow-web .
 No Render: *Runtime* Docker, *Dockerfile Path* `./src/OrderFlow.Api/Dockerfile` (ou `Web`), *Docker Build Context Directory* `.`
 (raiz). Os containers escutam na porta da variável `PORT` (8080 se ela não existir).
 
+## Blueprint (`render.yaml`)
+O `render.yaml` na raiz descreve os dois serviços (imagem, contexto de build, health check e variáveis).
+No Render: *New → Blueprint*, escolha o repositório e a branch. O Render pede só os valores marcados como
+`sync: false` (`ConnectionStrings__Default` e `Api__BaseUrl`) e gera o `Jwt__Key` sozinho. Com
+`autoDeployTrigger: commit`, cada push na branch ligada faz um novo deploy.
+Como a URL da API só existe depois do primeiro deploy, preencha `Api__BaseUrl` do Web em seguida
+(*Environment* do serviço) e faça redeploy do Web.
+
 ## Health check
 API e Web respondem `200` em `GET /health` (só confirma que o processo está de pé; não consulta o banco,
 para não acordar o Neon). No Render, *Health Check Path* = `/health`.

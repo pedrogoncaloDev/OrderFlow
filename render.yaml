@@ -1,0 +1,36 @@
+# Blueprint do Render: cria a API e o Web como serviços Docker (ver docs/deploy.md).
+# O banco é um Postgres do Neon (fora do Render); a connection string entra pelo painel.
+# Escolha a região do Render próxima à do banco no Neon (ex.: virginia <-> AWS us-east-1).
+
+services:
+  - type: web
+    name: orderflow-api
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./src/OrderFlow.Api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      # Connection string do Neon no formato Npgsql (host direto, sem -pooler). Informada no painel.
+      - key: ConnectionStrings__Default
+        sync: false
+      # Chave de assinatura dos JWT: o Render gera um valor aleatório de 256 bits.
+      - key: Jwt__Key
+        generateValue: true
+
+  - type: web
+    name: orderflow-web
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./src/OrderFlow.Web/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      # URL pública da API (ex.: https://orderflow-api.onrender.com). Informada no painel
+      # depois que a API existir, pois o endereço final pode ganhar um sufixo se o nome estiver em uso.
+      - key: Api__BaseUrl
+        sync: false
