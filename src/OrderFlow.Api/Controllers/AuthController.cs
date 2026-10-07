@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using OrderFlow.Api.Models.Auth;
+using OrderFlow.Api.Requests;
 using OrderFlow.Application.Auth;
 using OrderFlow.Domain.Entities;
 using OrderFlow.Domain.Enums;
