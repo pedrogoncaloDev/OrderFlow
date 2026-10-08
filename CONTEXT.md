@@ -41,7 +41,7 @@ Referências entre projetos: Application → Domain · Infrastructure → Applic
 ## 4. Modelo de dados (PostgreSQL, snake_case)
 | Tabela | Campos principais | Regras |
 |---|---|---|
-| `customers` | id (Guid), name (≤200), email (≤320, **único**), created_at | — |
+| `customers` | id (Guid), owner_id → users, name (≤200), email (≤320), phone (≤30, opcional), created_at | Dono = usuário do token (ADR 0004); e-mail **único por dono** (índice owner_id + email) |
 | `products` | id, name (≤200), description (≤1000, opcional), price (18,2), stock_quantity, created_at | — |
 | `orders` | id, customer_id → customers, status (texto, ≤20), total_amount (18,2), created_at | FK `Restrict`: não apaga cliente com pedidos |
 | `order_items` | id, order_id → orders, product_id → products, quantity, unit_price (18,2) | order `Cascade`; produto `Restrict`; `unit_price` é cópia do preço no momento da compra |
@@ -49,7 +49,7 @@ Referências entre projetos: Application → Domain · Infrastructure → Applic
 
 Enums (guardados como texto): `OrderStatus` = Pending, Confirmed, Cancelled · `UserRole` = Customer, Admin.
 Relações: Customer 1─N Order 1─N OrderItem N─1 Product · User N─0..1 Customer.
-Migration existente: `20260930234747_InitialCreate` (mais o `AppDbContextModelSnapshot`).
+Migrations: `20260930234747_InitialCreate`, `20261008012314_AddOwnerAndPhoneToCustomers` (mais o `AppDbContextModelSnapshot`).
 Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo (soma de `Quantity × UnitPrice`) ainda não existe.
 
 ## 5. Configuração e ambientes
@@ -68,9 +68,10 @@ Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo
 
 - Cadastro, login e `/api/auth/me` com JWT e hash de senha (tudo no `AuthController`, que usa o `AppDbContext`, o `IdentityPasswordHasher` e o `JwtTokenGenerator`; sem serviço, repositório ou interfaces). Ver ADR 0002, ADR 0003 e `docs/guia-autenticacao.md`.
 - Front-end Blazor com login, cadastro, página de perfil protegida e layout (sem Counter/Weather).
+- **Clientes** (mini ERP, ADR 0004): `CustomersController` (`/api/customers`: listar com busca por nome ou e-mail e paginação, obter, criar, editar, excluir; 404 para cliente de outro usuário, 409 para e-mail repetido do mesmo dono ou ao excluir cliente com pedidos) e telas `/clientes`, `/clientes/novo`, `/clientes/{id}/editar`. Testes de integração em `tests/OrderFlow.IntegrationTests` (API em memória com SQLite, sem Docker).
 
 **Ainda não existe**
-- Controllers/endpoints, DTOs, validações, casos de uso (Application está vazio).
+- Controllers/endpoints de produtos e pedidos; casos de uso na Application (os controllers falam direto com o `AppDbContext`, como no auth).
 - Publicação de eventos e consumo no Worker; `Contracts` vazio; nenhum pacote de RabbitMQ referenciado.
 - Dockerfiles e serviços `api`/`worker`/`web` no compose (estão comentados).
 - Testes reais (apenas `UnitTest1` vazio) — a CI passa, mas sem cobertura.
