@@ -62,6 +62,7 @@ Worker → Infrastructure + Contracts      Web → (nada por enquanto; falará c
 - Dependência nunca aponta "para fora": Domain não conhece Application, que não conhece Infrastructure.
 
 ## Convenções
+- **Organização por feature** (ADR 0005): em `OrderFlow.Api` e `OrderFlow.Web`, cada recurso tem a própria pasta na raiz do projeto (`Auth/`, `Products/`) com controller/página, requests, responses, extensions e cliente HTTP juntos; o que é de mais de uma feature fica em `Common/`. Namespace = pasta (`OrderFlow.Api.Products`). Recurso novo → pasta nova. Domain, Application e Infrastructure continuam por camada.
 - **Idioma**: commits, comentários, mensagens de erro e documentação em **português (pt-BR)**; identificadores de código em inglês.
 - **Commits**: Conventional Commits em português — `feat:`, `fix:`, `test:`, `refactor:`, `docs:`, `chore:`.
 - **Git**: branch por funcionalidade (`feat/feature-name`), PR para `main`. **Nomes de branch sempre em inglês**, em kebab-case, com o prefixo do tipo (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `chore/`); ex.: `feat/change-password`. Não commite direto em `main`.
