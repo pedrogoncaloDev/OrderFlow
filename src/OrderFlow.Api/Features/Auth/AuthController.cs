@@ -8,7 +8,7 @@ using OrderFlow.Domain.Enums;
 using OrderFlow.Infrastructure.Auth;
 using OrderFlow.Infrastructure.Persistence;
 
-namespace OrderFlow.Api.Auth;
+namespace OrderFlow.Api.Features.Auth;
 
 [ApiController]
 [Route("api/auth")]

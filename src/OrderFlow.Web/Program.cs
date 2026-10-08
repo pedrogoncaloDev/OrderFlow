@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using OrderFlow.Web.Components;
-using OrderFlow.Web.Auth;
+using OrderFlow.Web.Features.Auth;
 using OrderFlow.Web.Common;
 
 var builder = WebApplication.CreateBuilder(args);

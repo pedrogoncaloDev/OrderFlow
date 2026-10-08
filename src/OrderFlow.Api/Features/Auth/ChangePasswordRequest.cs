@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using OrderFlow.Application.Auth;
 
-namespace OrderFlow.Api.Auth;
+namespace OrderFlow.Api.Features.Auth;
 
 /// <summary>Corpo de POST /api/auth/change_password.</summary>
 public sealed class ChangePasswordRequest

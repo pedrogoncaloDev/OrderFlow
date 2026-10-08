@@ -1,7 +1,7 @@
 using System.Net;
 using OrderFlow.Web.Common;
 
-namespace OrderFlow.Web.Auth;
+namespace OrderFlow.Web.Features.Auth;
 
 /// <summary>
 /// Base dos clientes que exigem login: pega o token da sessão atual a cada chamada e, se a API

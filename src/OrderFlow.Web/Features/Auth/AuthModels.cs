@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderFlow.Web.Auth;
+namespace OrderFlow.Web.Features.Auth;
 
 /// <summary>Formulário de login.</summary>
 public sealed class LoginModel

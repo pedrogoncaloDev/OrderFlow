@@ -6,7 +6,7 @@ using OrderFlow.Api.Common;
 using OrderFlow.Domain.Entities;
 using OrderFlow.Infrastructure.Persistence;
 
-namespace OrderFlow.Api.Products;
+namespace OrderFlow.Api.Features.Products;
 
 /// <summary>
 /// Cadastro de produtos. Todo acesso é restrito ao dono do token (ADR 0004): produto de outro

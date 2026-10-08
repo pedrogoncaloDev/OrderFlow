@@ -1,6 +1,6 @@
 using OrderFlow.Domain.Entities;
 
-namespace OrderFlow.Api.Products;
+namespace OrderFlow.Api.Features.Products;
 
 /// <summary>Dados do produto devolvidos pela API (sem o dono, que é sempre o usuário do token).</summary>
 public sealed record ProductResponse(

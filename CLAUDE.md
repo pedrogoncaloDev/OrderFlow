@@ -62,9 +62,10 @@ Worker → Infrastructure + Contracts      Web → (nada por enquanto; falará c
 - Dependência nunca aponta "para fora": Domain não conhece Application, que não conhece Infrastructure.
 
 ## Convenções
-- **Organização por feature** (ADR 0005): em `OrderFlow.Api` e `OrderFlow.Web`, cada recurso tem a própria pasta na raiz do projeto (`Auth/`, `Products/`) com controller/página, requests, responses, extensions e cliente HTTP juntos; o que é de mais de uma feature fica em `Common/`. Namespace = pasta (`OrderFlow.Api.Products`). Recurso novo → pasta nova. Domain, Application e Infrastructure continuam por camada.
+- **Organização por feature** (ADR 0005): em `OrderFlow.Api` e `OrderFlow.Web`, cada recurso tem a própria pasta em `Features/` (`Features/Auth/`, `Features/Products/`) com controller/página, requests, responses, extensions e cliente HTTP juntos; o que é de mais de uma feature fica em `Common/`, ao lado de `Features/`. Namespace = pasta (`OrderFlow.Api.Features.Products`). Recurso novo → pasta nova em `Features/`. Domain, Application e Infrastructure continuam por camada.
 - **Idioma**: commits, comentários, mensagens de erro e documentação em **português (pt-BR)**; identificadores de código em inglês.
 - **Commits**: Conventional Commits em português — `feat:`, `fix:`, `test:`, `refactor:`, `docs:`, `chore:`.
+- **Commits são do usuário**: o Claude **não faz commits** (nem `git commit`, nem `--amend`, nem push). No máximo, ao terminar uma tarefa, sugere a mensagem de commit (Conventional Commits em pt-BR) para o usuário commitar. Pode usar `git add`/`git mv` e criar branch quando pedido.
 - **Git**: branch por funcionalidade (`feat/feature-name`), PR para `main`. **Nomes de branch sempre em inglês**, em kebab-case, com o prefixo do tipo (`feat/`, `fix/`, `docs/`, `refactor/`, `test/`, `chore/`); ex.: `feat/change-password`. Não commite direto em `main`.
 - **Formatação** (`.editorconfig`): UTF-8, **LF**, 4 espaços em C#, 2 espaços em `yml/json/md/csproj`, newline final, sem espaços no fim da linha. Não use tabs. (`*.sln` é CRLF por `.gitattributes`.)
 - **Banco**: tabelas e colunas em snake_case (convention); enums persistidos como **texto** (`HasConversion<string>()`); valores monetários com `HasPrecision(18, 2)`; chaves `Guid` geradas na aplicação (`ValueGeneratedNever`); datas em UTC (`DateTime.UtcNow`).

@@ -26,9 +26,9 @@ OrderFlow/
 │   ├── OrderFlow.Application     casos de uso, validações, DTOs (hoje só `AuthClaimTypes` e `PasswordPolicy`)
 │   ├── OrderFlow.Infrastructure  EF Core: AppDbContext, Configurations, Migrations
 │   ├── OrderFlow.Contracts       eventos/contratos compartilhados (vazio por enquanto)
-│   ├── OrderFlow.Api             Web API (composition root); pastas por feature: Auth/, Products/, Common/ (ADR 0005)
+│   ├── OrderFlow.Api             Web API (composition root); pastas por feature em Features/ (Auth, Products) + Common/ (ADR 0005)
 │   ├── OrderFlow.Worker          Worker Service (template; ainda não consome nada)
-│   └── OrderFlow.Web             Blazor; pastas por feature: Auth/, Products/, Common/ + Components/ (App, Layout, Pages, Shared)
+│   └── OrderFlow.Web             Blazor; pastas por feature em Features/ (Auth, Products) + Common/ + Components/ (App, Layout, Pages, Shared)
 ├── tests/
 │   ├── OrderFlow.UnitTests       xUnit — só placeholder (UnitTest1)
 │   └── OrderFlow.IntegrationTests xUnit — só placeholder; referencia a Api
@@ -100,7 +100,7 @@ Initial commit → estrutura inicial de pastas → remoção dos `Class1.cs` de 
 - Autenticação sem refresh token, sem bloqueio por tentativas e sem confirmação de e-mail (ver ADR 0002).
 - Código de autenticação (e a simplificação do ADR 0003) escrito sem `dotnet build`/`dotnet test` no ambiente (SDK indisponível): rodar ambos antes de commitar.
 - `.csproj` de Application/Domain/Infrastructure/Contracts e os `UnitTest1.cs` têm BOM UTF-8; `.editorconfig` define `charset = utf-8` (sem BOM). Padronizar.
-- `StartupExtensions` está definido dentro de `Program.cs` da API; ao crescer, mover para arquivos próprios (`Common/` ou na pasta da feature).
+- `StartupExtensions` está definido dentro de `Program.cs` da API; ao crescer, mover para arquivos próprios (`Common/` ou na pasta da feature em `Features/`).
 - A reestruturação por feature (ADR 0005) foi feita sem `dotnet build` (SDK indisponível): rodar build e testes antes do merge.
 - Não consegui rodar `dotnet build`/`dotnet test` ao montar estes documentos (SDK indisponível no ambiente), então o estado de build é inferido da leitura do código.
 
