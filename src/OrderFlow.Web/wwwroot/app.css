@@ -834,3 +834,9 @@ code {
     height: 2px;
     background: repeating-linear-gradient(90deg, #cfc9bb 0 6px, transparent 6px 12px);
 }
+
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+

@@ -1,6 +1,6 @@
 @using System.Linq.Expressions
 
-<div class="form-field">
+<div class=Id"form-field">
     <label for="@Id" class="form-label">@Label</label>
 
     <div class="field-wrap">
@@ -10,7 +10,7 @@
                    placeholder="@Placeholder"
                    autocomplete="@Autocomplete"
                    disabled="@Disabled"
-                   Value="Value"
+                   Value="@Value"
                    ValueChanged="ValueChanged"
                    ValueExpression="ValueExpression" />
 
@@ -20,7 +20,8 @@
                     class="field-toggle"
                     @onclick="ToggleVisibility"
                     disabled="@Disabled"
-                    aria-label="@(_visible ? "Ocultar senha" : "Mostrar senha")">
+                    aria-label="@(_visible ? "Ocultar senha" : "Mostrar senha")"
+            >
                 @(_visible ? "Ocultar" : "Mostrar")
             </button>
         }
