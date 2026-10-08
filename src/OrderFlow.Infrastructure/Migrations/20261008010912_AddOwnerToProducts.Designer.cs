@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OrderFlow.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using OrderFlow.Infrastructure.Persistence;
 namespace OrderFlow.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261008010912_AddOwnerToProducts")]
+    partial class AddOwnerToProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,24 +47,12 @@ namespace OrderFlow.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("owner_id");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("phone");
-
                     b.HasKey("Id")
                         .HasName("pk_customers");
 
-                    b.HasIndex("OwnerId", "Email")
+                    b.HasIndex("Email")
                         .IsUnique()
-                        .HasDatabaseName("ix_customers_owner_id_email");
-
-                    b.HasIndex("OwnerId", "Name")
-                        .HasDatabaseName("ix_customers_owner_id_name");
+                        .HasDatabaseName("ix_customers_email");
 
                     b.ToTable("customers", (string)null);
                 });
@@ -226,16 +217,6 @@ namespace OrderFlow.Infrastructure.Migrations
                         .HasDatabaseName("ix_users_email");
 
                     b.ToTable("users", (string)null);
-                });
-
-            modelBuilder.Entity("OrderFlow.Domain.Entities.Customer", b =>
-                {
-                    b.HasOne("OrderFlow.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_customers_users_owner_id");
                 });
 
             modelBuilder.Entity("OrderFlow.Domain.Entities.Order", b =>
