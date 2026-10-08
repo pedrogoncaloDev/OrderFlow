@@ -68,7 +68,7 @@ Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo
 
 - Cadastro, login e `/api/auth/me` com JWT e hash de senha (tudo no `AuthController`, que usa o `AppDbContext`, o `IdentityPasswordHasher` e o `JwtTokenGenerator`; sem serviço, repositório ou interfaces). Ver ADR 0002, ADR 0003 e `docs/guia-autenticacao.md`.
 - Front-end Blazor com login, cadastro, página de perfil protegida e layout (sem Counter/Weather).
-- **Produtos** (mini ERP, ADR 0004): `ProductsController` (`/api/products`: listar com busca e paginação, obter, criar, editar, excluir; 404 para produto de outro usuário, 409 ao excluir produto já vendido) e telas `/produtos`, `/produtos/novo`, `/produtos/{id}/editar`. Testes de integração em `tests/OrderFlow.IntegrationTests` (API em memória com SQLite, sem Docker).
+- **Produtos** (mini ERP, ADR 0004): `ProductsController` (`/api/products`: listar com busca e paginação, obter, criar, editar, excluir; 404 para produto de outro usuário, 409 ao excluir produto já vendido) e telas `/produtos`, `/produtos/novo`, `/produtos/{id}/editar`. Ainda sem testes automatizados.
 
 **Ainda não existe**
 - Controllers/endpoints de clientes e pedidos; casos de uso na Application (os controllers falam direto com o `AppDbContext`, como no auth).

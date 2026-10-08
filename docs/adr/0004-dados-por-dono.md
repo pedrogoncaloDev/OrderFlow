@@ -8,7 +8,7 @@ O modelo inicial não tinha o conceito de "de quem é" um cadastro: qualquer pro
 ## Decisão
 - `products` e `customers` ganham `owner_id` (obrigatório, FK para `users`, `Restrict`). O dono é sempre o usuário do token (claim `sub`), definido no servidor; nunca vem do corpo da requisição.
 - Todo acesso aos cadastros filtra por `owner_id`. Registro de outro dono responde **404**, igual a um registro inexistente, para não revelar que ele existe.
-- Os filtros são explícitos em cada consulta do controller (sem filtro global do EF Core), seguindo a simplicidade do ADR 0003. Cada endpoint novo precisa repetir o filtro; os testes de integração cobrem o isolamento entre dois usuários.
+- Os filtros são explícitos em cada consulta do controller (sem filtro global do EF Core), seguindo a simplicidade do ADR 0003. Cada endpoint novo precisa repetir o filtro, e ainda não há testes automatizados que garantam o isolamento entre usuários.
 - A unicidade do e-mail do cliente passa a ser **por dono**: índice único em (`owner_id`, `email`).
 - Regras de exclusão mantidas: produto vendido e cliente com pedidos não podem ser apagados (`Restrict`); a API responde **409**.
 - Listagens são paginadas (`page`, `pageSize` de 1 a 100) e ordenadas por nome.

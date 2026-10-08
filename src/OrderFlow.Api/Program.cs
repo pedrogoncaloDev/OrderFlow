@@ -30,9 +30,6 @@ app.MapHealthChecks("/health");
 
 app.Run();
 
-// Necessário para que os testes de integração (WebApplicationFactory) enxerguem o ponto de entrada.
-public partial class Program;
-
 static class StartupExtensions
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
