@@ -35,11 +35,20 @@ else if (_user is not null)
             </div>
             <div>
                 <dt>Conta criada em</dt>
-                <dd>@FormatUtc(_user.CreatedAt)</dd>
+                <dd><LocalTime Value="_user.CreatedAt" /></dd>
             </div>
             <div>
                 <dt>Sessão expira em</dt>
-                <dd>@(Auth.SessionExpiresAtUtc is { } expires ? FormatUtc(expires) : "—")</dd>
+                <dd>
+                    @if (Auth.SessionExpiresAtUtc is { } expires)
+                    {
+                        <LocalTime Value="expires" />
+                    }
+                    else
+                    {
+                        <text>—</text>
+                    }
+                </dd>
             </div>
             <div>
                 <dt>Identificador</dt>
@@ -93,7 +102,4 @@ else if (_user is not null)
         "Customer" => "Cliente",
         _ => role
     };
-
-    private static string FormatUtc(DateTime value) =>
-        value.ToUniversalTime().ToString("dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
 }

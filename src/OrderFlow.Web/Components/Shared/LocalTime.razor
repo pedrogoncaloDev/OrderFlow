@@ -1,0 +1,61 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<time datetime="@IsoValue">@_text</time>
+
+@code {
+    private IJSObjectReference? _module;
+    private string? _formattedFor;
+    private string _text = "…";
+
+    /// <summary>Instante em UTC (valores com Kind Local são convertidos; Unspecified é tratado como UTC).</summary>
+    [Parameter, EditorRequired]
+    public DateTime Value { get; set; }
+
+    private string IsoValue => AsUtc(Value).ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+
+    protected override void OnParametersSet()
+    {
+        // Enquanto o navegador não formata, mostra o valor em UTC.
+        if (_formattedFor != IsoValue)
+            _text = AsUtc(Value).ToString("dd/MM/yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var iso = IsoValue;
+        if (_formattedFor == iso)
+            return;
+
+        try
+        {
+            // O servidor não conhece o fuso do usuário: quem formata é o navegador.
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./Components/Shared/LocalTime.razor.js");
+            _text = await _module.InvokeAsync<string>("formatLocal", iso);
+            _formattedFor = iso;
+            StateHasChanged();
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuito encerrado: nada a fazer.
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_module is null)
+            return;
+
+        try
+        {
+            await _module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private static DateTime AsUtc(DateTime value) => value.Kind == DateTimeKind.Local
+        ? value.ToUniversalTime()
+        : DateTime.SpecifyKind(value, DateTimeKind.Utc);
+}
