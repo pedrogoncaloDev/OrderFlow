@@ -1,6 +1,6 @@
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
-using OrderFlow.Api.Extensions;
+using OrderFlow.Api.Auth;
 using OrderFlow.Infrastructure.Persistence;
 
 Env.TraversePath().Load();

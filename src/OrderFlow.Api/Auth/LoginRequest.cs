@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using OrderFlow.Application.Auth;
 
-namespace OrderFlow.Api.Requests;
+namespace OrderFlow.Api.Auth;
 
 /// <summary>Corpo de POST /api/auth/login.</summary>
 public sealed class LoginRequest
