@@ -38,6 +38,8 @@ OrderFlow/
 ```
 Referências entre projetos: Application → Domain · Infrastructure → Application · Api → Application, Infrastructure, Contracts · Worker → Infrastructure, Contracts · Web → nenhuma · UnitTests → Domain, Application · IntegrationTests → Api.
 
+Por que projetos separados (e não pastas na Api): o Worker (previsto) é outro executável que precisa do banco (`Infrastructure`) e dos eventos (`Contracts`) sem carregar a Api inteira; e, como projeto, o `Domain` não consegue referenciar EF Core nem ASP.NET (o compilador impõe a regra de dependência). A `Application` tem pouco conteúdo hoje (ADR 0003); se os casos de uso do Worker e dos pedidos não a encorparem, reavaliar a fusão com o `Domain`.
+
 ## 4. Modelo de dados (PostgreSQL, snake_case)
 | Tabela | Campos principais | Regras |
 |---|---|---|
