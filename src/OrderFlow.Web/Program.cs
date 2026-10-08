@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddHealthChecks();
+
 // Autenticação do front-end: o JWT emitido pela API fica guardado no navegador (criptografado)
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
@@ -41,5 +43,7 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapHealthChecks("/health");
 
 app.Run();

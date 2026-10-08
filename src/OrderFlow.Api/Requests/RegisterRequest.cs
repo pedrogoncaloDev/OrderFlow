@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using OrderFlow.Application.Auth;
 
-namespace OrderFlow.Application.Auth;
+namespace OrderFlow.Api.Requests;
 
+/// <summary>Corpo de POST /api/auth/register.</summary>
 public sealed class RegisterRequest
 {
     [Required(ErrorMessage = "Informe o e-mail.")]

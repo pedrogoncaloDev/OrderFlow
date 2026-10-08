@@ -7,7 +7,7 @@ using OrderFlow.Domain.Entities;
 
 namespace OrderFlow.Infrastructure.Auth;
 
-public sealed class JwtTokenGenerator : ITokenGenerator
+public sealed class JwtTokenGenerator
 {
     private readonly JwtOptions _options;
     private readonly TimeProvider _clock;
@@ -19,7 +19,7 @@ public sealed class JwtTokenGenerator : ITokenGenerator
         _clock = clock;
     }
 
-    public GeneratedToken Generate(User user)
+    public (string Value, DateTime ExpiresAtUtc) Generate(User user)
     {
         var now = _clock.GetUtcNow().UtcDateTime;
         var expiresAt = now.AddMinutes(_options.ExpirationMinutes);
@@ -43,6 +43,6 @@ public sealed class JwtTokenGenerator : ITokenGenerator
             expires: expiresAt,
             signingCredentials: credentials);
 
-        return new GeneratedToken(new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
+        return (new JwtSecurityTokenHandler().WriteToken(token), expiresAt);
     }
 }

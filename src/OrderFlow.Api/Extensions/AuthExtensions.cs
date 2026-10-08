@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using OrderFlow.Application.Auth;
 using OrderFlow.Infrastructure.Auth;
-using OrderFlow.Infrastructure.Persistence.Repositories;
 
 namespace OrderFlow.Api.Extensions;
 
@@ -40,10 +39,8 @@ public static class AuthExtensions
 
         services.AddSingleton(jwt);
         services.AddSingleton(TimeProvider.System);
-        services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
-        services.AddSingleton<ITokenGenerator, JwtTokenGenerator>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IAuthService, AuthService>();
+        services.AddSingleton<IdentityPasswordHasher>();
+        services.AddSingleton<JwtTokenGenerator>();
 
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
