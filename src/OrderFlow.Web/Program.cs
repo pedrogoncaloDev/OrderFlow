@@ -20,11 +20,14 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredServ
 var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
     ?? throw new InvalidOperationException("Configure 'Api:BaseUrl' (variável de ambiente 'Api__BaseUrl') com o endereço da OrderFlow.Api.");
 
-builder.Services.AddHttpClient<AuthApiClient>(client =>
+builder.Services.AddHttpClient(ApiClientBase.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl.TrimEnd('/') + "/");
     client.Timeout = TimeSpan.FromSeconds(15);
 });
+
+// Todo cliente da API (classe que herda de ApiClientBase) é registrado sozinho, com o HttpClient acima.
+builder.Services.AddApiClients();
 
 var app = builder.Build();
 

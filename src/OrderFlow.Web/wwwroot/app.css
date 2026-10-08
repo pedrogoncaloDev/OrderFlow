@@ -840,3 +840,207 @@ input::-ms-clear {
     display: none;
 }
 
+/* ---------- Cadastros (listas, tabelas e formulários dos módulos) ---------- */
+
+.page-header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+
+.toolbar .form-control {
+    flex: 1 1 240px;
+    max-width: 420px;
+}
+
+.table-wrap {
+    overflow-x: auto;
+    padding: 0;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .95rem;
+}
+
+.data-table th {
+    padding: .85rem 1.1rem;
+    text-align: left;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--of-muted);
+    border-bottom: 1px solid var(--of-line);
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: .85rem 1.1rem;
+    border-bottom: 1px solid var(--of-line);
+    vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.data-table tbody tr:hover {
+    background: #faf8f3;
+}
+
+.data-table .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.cell-title {
+    font-weight: 700;
+}
+
+.cell-sub {
+    display: block;
+    color: var(--of-muted);
+    font-size: .85rem;
+    max-width: 48ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.row-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .4rem;
+    white-space: nowrap;
+}
+
+.btn-outline-danger {
+    --bs-btn-color: var(--of-danger);
+    --bs-btn-border-color: #e8c4c0;
+    --bs-btn-hover-bg: var(--of-danger);
+    --bs-btn-hover-border-color: var(--of-danger);
+    --bs-btn-hover-color: #fff;
+}
+
+.badge-stock {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    background: #e3f4ec;
+    color: var(--of-ok);
+}
+
+.badge-stock-out {
+    background: #fde8e6;
+    color: var(--of-danger);
+}
+
+.badge-stock-low {
+    background: #fff4d6;
+    color: #8a5a00;
+}
+
+.empty-panel {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+.empty-panel h2 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0 0 .35rem;
+}
+
+.empty-panel p {
+    color: var(--of-muted);
+    margin: 0 0 1.25rem;
+}
+
+.pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+.pager-info {
+    color: var(--of-muted);
+    font-size: .9rem;
+}
+
+.form-card {
+    max-width: 640px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 1rem;
+}
+
+@media (min-width: 560px) {
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-top: .5rem;
+}
+
+.dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    background: rgba(14, 26, 43, .45);
+}
+
+.dialog {
+    width: 100%;
+    max-width: 440px;
+    background: var(--of-surface);
+    border-radius: 18px;
+    box-shadow: var(--of-shadow);
+    padding: 1.75rem;
+}
+
+.dialog-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin: 0 0 .5rem;
+}
+
+.dialog-message {
+    color: var(--of-muted);
+    margin: 0 0 1.5rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .6rem;
+}
+

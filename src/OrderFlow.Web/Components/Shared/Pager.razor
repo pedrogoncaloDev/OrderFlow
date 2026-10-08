@@ -1,0 +1,19 @@
+@if (TotalPages > 1)
+{
+    <nav class="pager" aria-label="Paginação">
+        <button type="button" class="btn btn-ghost btn-sm" disabled="@(Page <= 1 || Disabled)" @onclick="() => OnPageChanged.InvokeAsync(Page - 1)">
+            Anterior
+        </button>
+        <span class="pager-info">Página @Page de @TotalPages</span>
+        <button type="button" class="btn btn-ghost btn-sm" disabled="@(Page >= TotalPages || Disabled)" @onclick="() => OnPageChanged.InvokeAsync(Page + 1)">
+            Próxima
+        </button>
+    </nav>
+}
+
+@code {
+    [Parameter] public int Page { get; set; } = 1;
+    [Parameter] public int TotalPages { get; set; } = 1;
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback<int> OnPageChanged { get; set; }
+}

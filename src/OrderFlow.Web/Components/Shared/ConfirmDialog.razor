@@ -1,0 +1,33 @@
+@if (Visible)
+{
+    <div class="dialog-backdrop" @onclick="Cancel">
+        <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-message" @onclick:stopPropagation="true">
+            <h2 id="confirm-title" class="dialog-title">@Title</h2>
+            <p id="confirm-message" class="dialog-message">@Message</p>
+
+            <div class="dialog-actions">
+                <button type="button" class="btn btn-ghost" disabled="@Busy" @onclick="Cancel">Cancelar</button>
+                <button type="button" class="btn btn-danger" disabled="@Busy" @onclick="Confirm">
+                    @(Busy ? "Aguarde..." : ConfirmText)
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public string Title { get; set; } = "Confirmar";
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public string ConfirmText { get; set; } = "Confirmar";
+
+    /// <summary>Enquanto a ação roda, os botões ficam desabilitados.</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private Task Confirm() => OnConfirm.InvokeAsync();
+
+    private Task Cancel() => Busy ? Task.CompletedTask : OnCancel.InvokeAsync();
+}
