@@ -1,0 +1,164 @@
+@inject ProductApiClient Products
+@inject NavigationManager Navigation
+
+<header class="page-header">
+    <h1 class="page-title">@(IsEditing ? "Editar produto" : "Novo produto")</h1>
+    <p class="page-subtitle">
+        @(IsEditing ? "Altere os dados do produto." : "Informe os dados do produto. O estoque inicial pode ser ajustado depois.")
+    </p>
+</header>
+
+@if (_loading)
+{
+    <div class="card-panel form-card" aria-busy="true">
+        <div class="skeleton skeleton-line w-50"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line w-75"></div>
+    </div>
+}
+else if (_notFound)
+{
+    <div class="alert alert-danger" role="alert">Produto não encontrado.</div>
+    <a class="btn btn-ghost" href="produtos">Voltar para produtos</a>
+}
+else
+{
+    <div class="card-panel form-card">
+        @if (_error is not null)
+        {
+            <div class="alert alert-danger" role="alert">@_error</div>
+        }
+
+        <EditForm Model="_model" OnValidSubmit="SubmitAsync" novalidate>
+            <DataAnnotationsValidator />
+
+            <FormField Id="product-name"
+                       Label="Nome"
+                       Placeholder='@("Ex.: Camiseta básica")'
+                       Disabled="_saving"
+                       @bind-Value="_model.Name" />
+
+            <div class="form-field">
+                <label for="product-description" class="form-label">Descrição <small class="text-muted">(opcional)</small></label>
+                <div class="field-wrap">
+                    <InputTextArea id="product-description"
+                                   class="form-control"
+                                   rows="3"
+                                   disabled="@_saving"
+                                   @bind-Value="_model.Description" />
+                </div>
+                <ValidationMessage For="() => _model.Description" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label for="product-price" class="form-label">Preço (R$)</label>
+                    <div class="field-wrap">
+                        <InputNumber id="product-price"
+                                     class="form-control"
+                                     inputmode="decimal"
+                                     step="0.01"
+                                     min="0"
+                                     ParsingErrorMessage="Informe um valor numérico."
+                                     disabled="@_saving"
+                                     @bind-Value="_model.Price" />
+                    </div>
+                    <ValidationMessage For="() => _model.Price" />
+                </div>
+
+                <div class="form-field">
+                    <label for="product-stock" class="form-label">Estoque (unidades)</label>
+                    <div class="field-wrap">
+                        <InputNumber id="product-stock"
+                                     class="form-control"
+                                     inputmode="numeric"
+                                     step="1"
+                                     min="0"
+                                     ParsingErrorMessage="Informe um número inteiro."
+                                     disabled="@_saving"
+                                     @bind-Value="_model.StockQuantity" />
+                    </div>
+                    <ValidationMessage For="() => _model.StockQuantity" />
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-brand" disabled="@_saving">
+                    @(_saving ? "Salvando..." : "Salvar")
+                </button>
+                <a class="btn btn-ghost @(_saving ? "disabled" : "")" href="produtos">Cancelar</a>
+            </div>
+        </EditForm>
+    </div>
+}
+
+@code {
+    /// <summary>Id do produto a editar; nulo para cadastrar um novo.</summary>
+    [Parameter] public Guid? ProductId { get; set; }
+
+    private ProductModel _model = new();
+    private Guid? _loadedId;
+    private bool _loading;
+    private bool _saving;
+    private bool _notFound;
+    private string? _error;
+
+    private bool IsEditing => ProductId is not null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Só carrega quando o produto muda: reaplicar os mesmos parâmetros não pode apagar o que foi digitado.
+        if (ProductId is not { } id || id == _loadedId)
+            return;
+
+        _loadedId = id;
+        _loading = true;
+        _notFound = false;
+        _error = null;
+
+        var result = await Products.GetAsync(id);
+
+        if (result.IsUnauthorized)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        if (result.IsNotFound)
+            _notFound = true;
+        else if (result.Succeeded)
+            _model = ProductModel.From(result.Value!);
+        else
+            _error = result.Error;
+
+        _loading = false;
+    }
+
+    private async Task SubmitAsync()
+    {
+        _saving = true;
+        _error = null;
+
+        var result = ProductId is { } id
+            ? await Products.UpdateAsync(id, _model)
+            : await Products.CreateAsync(_model);
+
+        if (result.IsUnauthorized)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        if (!result.Succeeded)
+        {
+            _error = result.Error;
+            _saving = false;
+            return;
+        }
+
+        Navigation.NavigateTo("produtos");
+    }
+
+    private void RedirectToLogin() =>
+        Navigation.NavigateTo("login?returnUrl=%2Fprodutos", replace: true);
+}
