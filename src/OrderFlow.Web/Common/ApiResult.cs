@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Common;
 
 /// <summary>Resultado de uma chamada à API: ou o valor, ou uma mensagem de erro pronta para exibir.</summary>
 public sealed record ApiResult<T>(bool Succeeded, T? Value, string? Error, HttpStatusCode? StatusCode)

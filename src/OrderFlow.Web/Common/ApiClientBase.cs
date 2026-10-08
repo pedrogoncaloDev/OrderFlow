@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Common;
 
 /// <summary>Base dos clientes HTTP da API: envia a requisição e traduz falhas em mensagens para o usuário.</summary>
 public abstract class ApiClientBase

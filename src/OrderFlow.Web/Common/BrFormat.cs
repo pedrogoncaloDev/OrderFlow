@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Common;
 
 /// <summary>Formatação no padrão brasileiro, sem depender da cultura instalada no servidor (contêiner).</summary>
 public static class BrFormat
