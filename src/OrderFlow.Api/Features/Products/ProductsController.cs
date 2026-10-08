@@ -2,14 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using OrderFlow.Api.Extensions;
-using OrderFlow.Api.Models.Common;
-using OrderFlow.Api.Models.Products;
-using OrderFlow.Api.Requests;
+using OrderFlow.Api.Common;
 using OrderFlow.Domain.Entities;
 using OrderFlow.Infrastructure.Persistence;
 
-namespace OrderFlow.Api.Controllers;
+namespace OrderFlow.Api.Features.Products;
 
 /// <summary>
 /// Cadastro de produtos. Todo acesso é restrito ao dono do token (ADR 0004): produto de outro

@@ -4,9 +4,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.JSInterop;
-using OrderFlow.Web.Models;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Features.Auth;
 
 /// <summary>
 /// Diz ao Blazor quem é o usuário atual. O token JWT fica no localStorage do navegador, mas

@@ -26,9 +26,9 @@ OrderFlow/
 │   ├── OrderFlow.Application     casos de uso, validações, DTOs (hoje só `AuthClaimTypes` e `PasswordPolicy`)
 │   ├── OrderFlow.Infrastructure  EF Core: AppDbContext, Configurations, Migrations
 │   ├── OrderFlow.Contracts       eventos/contratos compartilhados (vazio por enquanto)
-│   ├── OrderFlow.Api             Web API (composition root)
+│   ├── OrderFlow.Api             Web API (composition root); pastas por feature em Features/ (Auth, Products) + Common/ (ADR 0005)
 │   ├── OrderFlow.Worker          Worker Service (template; ainda não consome nada)
-│   └── OrderFlow.Web             Blazor (template: Home, Counter, Weather)
+│   └── OrderFlow.Web             Blazor; pastas por feature em Features/ (Auth, Products) + Common/ + Components/ (App, Layout, Pages, Shared)
 ├── tests/
 │   ├── OrderFlow.UnitTests       xUnit — só placeholder (UnitTest1)
 │   └── OrderFlow.IntegrationTests xUnit — só placeholder; referencia a Api
@@ -37,6 +37,8 @@ OrderFlow/
 ├── .env.example · .editorconfig · .gitattributes · .github/workflows/ci.yml
 ```
 Referências entre projetos: Application → Domain · Infrastructure → Application · Api → Application, Infrastructure, Contracts · Worker → Infrastructure, Contracts · Web → nenhuma · UnitTests → Domain, Application · IntegrationTests → Api.
+
+Por que projetos separados (e não pastas na Api): o Worker (previsto) é outro executável que precisa do banco (`Infrastructure`) e dos eventos (`Contracts`) sem carregar a Api inteira; e, como projeto, o `Domain` não consegue referenciar EF Core nem ASP.NET (o compilador impõe a regra de dependência). A `Application` tem pouco conteúdo hoje (ADR 0003); se os casos de uso do Worker e dos pedidos não a encorparem, reavaliar a fusão com o `Domain`.
 
 ## 4. Modelo de dados (PostgreSQL, snake_case)
 | Tabela | Campos principais | Regras |
@@ -100,7 +102,8 @@ Initial commit → estrutura inicial de pastas → remoção dos `Class1.cs` de 
 - Autenticação sem refresh token, sem bloqueio por tentativas e sem confirmação de e-mail (ver ADR 0002).
 - Código de autenticação (e a simplificação do ADR 0003) escrito sem `dotnet build`/`dotnet test` no ambiente (SDK indisponível): rodar ambos antes de commitar.
 - `.csproj` de Application/Domain/Infrastructure/Contracts e os `UnitTest1.cs` têm BOM UTF-8; `.editorconfig` define `charset = utf-8` (sem BOM). Padronizar.
-- `StartupExtensions` está definido dentro de `Program.cs` da API; ao crescer, mover para arquivos próprios (`Extensions/`).
+- `StartupExtensions` está definido dentro de `Program.cs` da API; ao crescer, mover para arquivos próprios (`Common/` ou na pasta da feature em `Features/`).
+- A reestruturação por feature (ADR 0005) foi feita sem `dotnet build` (SDK indisponível): rodar build e testes antes do merge.
 - Não consegui rodar `dotnet build`/`dotnet test` ao montar estes documentos (SDK indisponível no ambiente), então o estado de build é inferido da leitura do código.
 
 ## 10. Glossário

@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using OrderFlow.Application.Auth;
 using OrderFlow.Infrastructure.Auth;
 
-namespace OrderFlow.Api.Extensions;
+namespace OrderFlow.Api.Features.Auth;
 
 public static class AuthExtensions
 {

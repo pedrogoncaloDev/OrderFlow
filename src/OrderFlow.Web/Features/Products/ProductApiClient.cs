@@ -1,6 +1,7 @@
-using OrderFlow.Web.Models;
+using OrderFlow.Web.Features.Auth;
+using OrderFlow.Web.Common;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Features.Products;
 
 /// <summary>Cliente HTTP dos endpoints de produtos (/api/products).</summary>
 public sealed class ProductApiClient : AuthorizedApiClient

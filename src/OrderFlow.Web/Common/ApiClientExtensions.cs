@@ -1,4 +1,4 @@
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Common;
 
 public static class ApiClientExtensions
 {

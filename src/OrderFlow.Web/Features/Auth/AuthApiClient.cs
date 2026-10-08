@@ -1,6 +1,6 @@
-using OrderFlow.Web.Models;
+using OrderFlow.Web.Common;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Features.Auth;
 
 /// <summary>Cliente HTTP da API de autenticação.</summary>
 public sealed class AuthApiClient : ApiClientBase

@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using OrderFlow.Application.Auth;
 
-namespace OrderFlow.Api.Extensions;
+namespace OrderFlow.Api.Common;
 
 public static class ClaimsPrincipalExtensions
 {

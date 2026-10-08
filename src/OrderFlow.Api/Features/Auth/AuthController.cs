@@ -2,15 +2,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using OrderFlow.Api.Models.Auth;
-using OrderFlow.Api.Requests;
 using OrderFlow.Application.Auth;
 using OrderFlow.Domain.Entities;
 using OrderFlow.Domain.Enums;
 using OrderFlow.Infrastructure.Auth;
 using OrderFlow.Infrastructure.Persistence;
 
-namespace OrderFlow.Api.Controllers;
+namespace OrderFlow.Api.Features.Auth;
 
 [ApiController]
 [Route("api/auth")]

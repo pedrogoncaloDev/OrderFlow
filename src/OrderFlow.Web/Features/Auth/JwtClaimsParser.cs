@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace OrderFlow.Web.Services;
+namespace OrderFlow.Web.Features.Auth;
 
 /// <summary>
 /// Lê as claims do payload de um JWT. Atenção: a assinatura NÃO é verificada aqui (o front-end não tem a chave).

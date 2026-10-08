@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderFlow.Web.Models;
+namespace OrderFlow.Web.Features.Products;
 
 /// <summary>
 /// Formulário de produto (cadastro e edição). As regras espelham as da API (ProductRequest); a API
