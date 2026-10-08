@@ -80,7 +80,6 @@ Worker → Infrastructure + Contracts      Web → (nada por enquanto; falará c
 
 ## Armadilhas conhecidas (detalhes em CONTEXT.md)
 - Existem o `AuthController` e o `CustomersController`; os de produtos e pedidos ainda não. Cadastros são **isolados por dono** (ADR 0004): todo acesso filtra por `owner_id` (do claim `sub`, nunca do corpo) e registro de outro usuário responde 404.
-- Testes de integração sobem a API com SQLite em memória (`ApiFactory`), sem Docker: migrations e erros específicos do Postgres (`PostgresException`) não são exercitados neles.
 - O cliente HTTP do Web que herda de `AuthorizedApiClient` é registrado sozinho (`AddApiClients`); para um módulo novo basta criar a classe.
 - O auth não tem camadas intermediárias (ADR 0003): a lógica está no `AuthController` com o `AppDbContext`, e os corpos (`RegisterRequest`, `LoginRequest`) ficam no mesmo arquivo. Não há testes do auth até existirem testes de integração. Em recursos novos, decida caso a caso se vale extrair um serviço.
 - A chave do JWT vem de `Jwt__Key` (`.env`). Em Development, se vazia, a API gera uma chave temporária (sessões caem ao reiniciar); fora dele, a API não sobe sem a chave.
