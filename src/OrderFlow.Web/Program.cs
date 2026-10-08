@@ -18,7 +18,7 @@ builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredServ
 
 // Cliente HTTP da API
 var apiBaseUrl = builder.Configuration["Api:BaseUrl"]
-    ?? throw new InvalidOperationException("Configure 'Api:BaseUrl' em appsettings.json (endereço da OrderFlow.Api).");
+    ?? throw new InvalidOperationException("Configure 'Api:BaseUrl' (variável de ambiente 'Api__BaseUrl') com o endereço da OrderFlow.Api.");
 
 builder.Services.AddHttpClient<AuthApiClient>(client =>
 {
