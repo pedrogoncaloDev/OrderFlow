@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OrderFlow.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using OrderFlow.Infrastructure.Persistence;
 namespace OrderFlow.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261008012314_AddOwnerAndPhoneToCustomers")]
+    partial class AddOwnerAndPhoneToCustomers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,10 +159,6 @@ namespace OrderFlow.Infrastructure.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
 
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("owner_id");
-
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
@@ -172,15 +171,7 @@ namespace OrderFlow.Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("pk_products");
 
-                    b.HasIndex("OwnerId", "Name")
-                        .HasDatabaseName("ix_products_owner_id_name");
-
-                    b.ToTable("products", null, t =>
-                        {
-                            t.HasCheckConstraint("ck_products_price_non_negative", "price >= 0");
-
-                            t.HasCheckConstraint("ck_products_stock_quantity_non_negative", "stock_quantity >= 0");
-                        });
+                    b.ToTable("products", (string)null);
                 });
 
             modelBuilder.Entity("OrderFlow.Domain.Entities.User", b =>
@@ -269,16 +260,6 @@ namespace OrderFlow.Infrastructure.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("OrderFlow.Domain.Entities.Product", b =>
-                {
-                    b.HasOne("OrderFlow.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("fk_products_users_owner_id");
                 });
 
             modelBuilder.Entity("OrderFlow.Domain.Entities.User", b =>

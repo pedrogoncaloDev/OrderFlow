@@ -1,0 +1,138 @@
+@inject CustomerApiClient Customers
+@inject NavigationManager Navigation
+
+<header class="page-header">
+    <h1 class="page-title">@(IsEditing ? "Editar cliente" : "Novo cliente")</h1>
+    <p class="page-subtitle">
+        @(IsEditing ? "Altere os dados do cliente." : "Informe os dados de contato do cliente.")
+    </p>
+</header>
+
+@if (_loading)
+{
+    <div class="card-panel form-card" aria-busy="true">
+        <div class="skeleton skeleton-line w-50"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line w-75"></div>
+    </div>
+}
+else if (_notFound)
+{
+    <div class="alert alert-danger" role="alert">Cliente não encontrado.</div>
+    <a class="btn btn-ghost" href="clientes">Voltar para clientes</a>
+}
+else
+{
+    <div class="card-panel form-card">
+        @if (_error is not null)
+        {
+            <div class="alert alert-danger" role="alert">@_error</div>
+        }
+
+        <EditForm Model="_model" OnValidSubmit="SubmitAsync" novalidate>
+            <DataAnnotationsValidator />
+
+            <FormField Id="customer-name"
+                       Label="Nome"
+                       Autocomplete="off"
+                       Placeholder='@("Ex.: Maria Souza")'
+                       Disabled="_saving"
+                       @bind-Value="_model.Name" />
+
+            <FormField Id="customer-email"
+                       Label="E-mail"
+                       Type="email"
+                       Autocomplete="off"
+                       Placeholder='@("cliente@exemplo.com")'
+                       Hint="Cada cliente precisa ter um e-mail diferente."
+                       Disabled="_saving"
+                       @bind-Value="_model.Email" />
+
+            <FormField Id="customer-phone"
+                       Label="Telefone (opcional)"
+                       Type="tel"
+                       Autocomplete="off"
+                       Placeholder='@("(11) 99999-0000")'
+                       Disabled="_saving"
+                       @bind-Value="_model.Phone" />
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-brand" disabled="@_saving">
+                    @(_saving ? "Salvando..." : "Salvar")
+                </button>
+                <a class="btn btn-ghost @(_saving ? "disabled" : "")" href="clientes">Cancelar</a>
+            </div>
+        </EditForm>
+    </div>
+}
+
+@code {
+    /// <summary>Id do cliente a editar; nulo para cadastrar um novo.</summary>
+    [Parameter] public Guid? CustomerId { get; set; }
+
+    private CustomerModel _model = new();
+    private Guid? _loadedId;
+    private bool _loading;
+    private bool _saving;
+    private bool _notFound;
+    private string? _error;
+
+    private bool IsEditing => CustomerId is not null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Só carrega quando o cliente muda: reaplicar os mesmos parâmetros não pode apagar o que foi digitado.
+        if (CustomerId is not { } id || id == _loadedId)
+            return;
+
+        _loadedId = id;
+        _loading = true;
+        _notFound = false;
+        _error = null;
+
+        var result = await Customers.GetAsync(id);
+
+        if (result.IsUnauthorized)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        if (result.IsNotFound)
+            _notFound = true;
+        else if (result.Succeeded)
+            _model = CustomerModel.From(result.Value!);
+        else
+            _error = result.Error;
+
+        _loading = false;
+    }
+
+    private async Task SubmitAsync()
+    {
+        _saving = true;
+        _error = null;
+
+        var result = CustomerId is { } id
+            ? await Customers.UpdateAsync(id, _model)
+            : await Customers.CreateAsync(_model);
+
+        if (result.IsUnauthorized)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        if (!result.Succeeded)
+        {
+            _error = result.Error;
+            _saving = false;
+            return;
+        }
+
+        Navigation.NavigateTo("clientes");
+    }
+
+    private void RedirectToLogin() =>
+        Navigation.NavigateTo("login?returnUrl=%2Fclientes", replace: true);
+}
