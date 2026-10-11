@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderFlow.Api.Requests;
+namespace OrderFlow.Api.Features.Customers;
 
 /// <summary>Corpo de POST /api/customers e PUT /api/customers/{id}.</summary>
 public sealed class CustomerRequest : IValidatableObject

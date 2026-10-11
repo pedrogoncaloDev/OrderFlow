@@ -2,15 +2,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
-using OrderFlow.Api.Extensions;
-using OrderFlow.Api.Models.Common;
-using OrderFlow.Api.Models.Customers;
-using OrderFlow.Api.Requests;
+using OrderFlow.Api.Common;
 using OrderFlow.Application.Auth;
 using OrderFlow.Domain.Entities;
 using OrderFlow.Infrastructure.Persistence;
 
-namespace OrderFlow.Api.Controllers;
+namespace OrderFlow.Api.Features.Customers;
 
 /// <summary>
 /// Cadastro de clientes. Todo acesso é restrito ao dono do token (ADR 0004): cliente de outro

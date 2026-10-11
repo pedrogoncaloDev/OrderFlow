@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OrderFlow.Web.Models;
+namespace OrderFlow.Web.Features.Customers;
 
 /// <summary>
 /// Formulário de cliente (cadastro e edição). As regras espelham as da API (CustomerRequest); a API
