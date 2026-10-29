@@ -10,7 +10,7 @@ Na Api, um recurso se espalhava por `Controllers/`, `Models/`, `Requests/` e `Ex
 - O que serve a mais de uma feature fica em `Common/`, na raiz do projeto ao lado de `Features/`, para não se confundir com as features (Api: `PagedResponse`, `ClaimsPrincipalExtensions`; Web: `ApiClientBase`, `ApiResult`, `PagedResult`, `BrFormat`).
 - Namespace igual à pasta (`OrderFlow.Api.Features.Products`, `OrderFlow.Web.Features.Auth`). O `AuthorizedApiClient` fica em `Features/Auth/` porque depende da sessão (`JwtAuthenticationStateProvider`); assim `Common/` não depende de nenhuma feature.
 - No Web, `Components/` guarda só o que é da casca da aplicação: `App`, `Routes`, `Layout/`, páginas sem feature (`Home`, `Error`) e componentes genéricos em `Shared/` (`FormField`, `Pager`, `ConfirmDialog`...). O `_Imports.razor` foi para a raiz do projeto para valer nas pastas de feature.
-- Domain, Application e Infrastructure continuam organizados por camada (a regra de dependência do `CLAUDE.md` não muda).
+- Dentro da Api, `Domain/` e `Infrastructure/` ficam como pastas por camada ao lado de `Features/` (ADR 0006).
 
 ## Consequências
 - Recurso novo = pasta nova, sem mexer nas existentes; o código de um recurso fica no mesmo lugar.

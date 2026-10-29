@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using OrderFlow.Application.Auth;
 
 namespace OrderFlow.Api.Features.Auth;
 

@@ -25,11 +25,11 @@ Navegador ──▶ Login.razor ──▶ AuthApiClient ──HTTP──▶ Auth
 | Api | `Features/Auth/AuthController.cs` | Endpoints `/api/auth/*`, a lógica de cadastro/login/me |
 | Api | `Features/Auth/RegisterRequest.cs`, `LoginRequest.cs`, `ChangePasswordRequest.cs`, `AuthResponse.cs`, `UserResponse.cs` | Corpos de entrada e de resposta dos endpoints |
 | Api | `Features/Auth/AuthExtensions.cs` | Injeção de dependência e configuração do JwtBearer |
-| Application | `Auth/PasswordPolicy.cs` | Regras de senha (tamanho, letras e números) |
-| Application | `Auth/AuthClaimTypes.cs` | Nomes das claims do JWT (`sub`, `email`, `role`) |
-| Infrastructure | `Auth/IdentityPasswordHasher.cs` | Hash e verificação de senha |
-| Infrastructure | `Auth/JwtTokenGenerator.cs`, `JwtOptions.cs` | Criação do token |
-| Infrastructure | `Persistence/AppDbContext.cs` | Acesso ao banco (tabela `users`) |
+| Api | `Features/Auth/PasswordPolicy.cs` | Regras de senha (tamanho, letras e números) |
+| Api | `Features/Auth/AuthClaimTypes.cs` | Nomes das claims do JWT (`sub`, `email`, `role`) |
+| Api | `Features/Auth/IdentityPasswordHasher.cs` | Hash e verificação de senha |
+| Api | `Features/Auth/JwtTokenGenerator.cs`, `JwtOptions.cs` | Criação do token |
+| Api | `Infrastructure/Persistence/AppDbContext.cs` | Acesso ao banco (tabela `users`) |
 | Web | `Features/Auth/JwtAuthenticationStateProvider.cs` | Guarda o token e diz ao Blazor quem está logado |
 | Web | `Features/Auth/AuthApiClient.cs` | Fala com a API e converte erros em mensagens |
 | Web | `Features/Auth/Login.razor`, `Register.razor`, `Profile.razor` | Telas |

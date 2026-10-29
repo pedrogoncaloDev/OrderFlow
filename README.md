@@ -16,12 +16,7 @@ Blazor Web  ──HTTP/JWT──▶  API  ──▶  PostgreSQL
 
 | Pasta | Descrição |
 |---|---|
-| `src/OrderFlow.Api` | ASP.NET Core Web API (JWT, Swagger, migrations na inicialização) |
-| `src/OrderFlow.Application` | Casos de uso, validações, DTOs |
-| `src/OrderFlow.Domain` | Entidades e regras de negócio |
-| `src/OrderFlow.Infrastructure` | EF Core, migrations, mensageria |
-| `src/OrderFlow.Contracts` | Eventos e contratos compartilhados |
-| `src/OrderFlow.Worker` | Worker Service que consome eventos |
+| `src/OrderFlow.Api` | ASP.NET Core Web API: `Features/` (Auth, Products), `Domain/` (entidades), `Infrastructure/` (EF Core e migrations), `Common/` |
 | `src/OrderFlow.Web` | Front-end Blazor |
 | `tests/` | Testes unitários e de integração |
 | `docs/` | Diagramas e ADRs (decisões de arquitetura) |

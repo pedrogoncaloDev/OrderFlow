@@ -14,7 +14,7 @@ public sealed class LoginModel
 }
 
 /// <summary>
-/// Formulário de cadastro. As regras de senha espelham as da API (PasswordPolicy, em OrderFlow.Application);
+/// Formulário de cadastro. As regras de senha espelham as da API (PasswordPolicy, em Features/Auth da API);
 /// a API continua sendo a fonte da verdade e valida tudo de novo.
 /// </summary>
 public sealed class RegisterModel

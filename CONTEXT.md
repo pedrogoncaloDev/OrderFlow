@@ -22,23 +22,22 @@ Monorepo (ADR 0001): um único `docker compose up` deve subir o sistema inteiro,
 ```
 OrderFlow/
 ├── src/
-│   ├── OrderFlow.Domain          entidades e enums (sem dependências)
-│   ├── OrderFlow.Application     casos de uso, validações, DTOs (hoje só `AuthClaimTypes` e `PasswordPolicy`)
-│   ├── OrderFlow.Infrastructure  EF Core: AppDbContext, Configurations, Migrations
-│   ├── OrderFlow.Contracts       eventos/contratos compartilhados (vazio por enquanto)
-│   ├── OrderFlow.Api             Web API (composition root); pastas por feature em Features/ (Auth, Products) + Common/ (ADR 0005)
-│   ├── OrderFlow.Worker          Worker Service (template; ainda não consome nada)
+│   ├── OrderFlow.Api             Web API (composition root), projeto único do backend (ADR 0006)
+│   │   ├── Features/             Auth/, Products/ (controller, requests, responses, extensions; ADR 0005)
+│   │   ├── Domain/               Entities/, Enums/ (entidades e enums, sem EF Core)
+│   │   ├── Infrastructure/       Persistence/ (AppDbContext, Configurations), Migrations/
+│   │   └── Common/               PagedResponse, ClaimsPrincipalExtensions
 │   └── OrderFlow.Web             Blazor; pastas por feature em Features/ (Auth, Products) + Common/ + Components/ (App, Layout, Pages, Shared)
 ├── tests/
 │   ├── OrderFlow.UnitTests       xUnit — só placeholder (UnitTest1)
 │   └── OrderFlow.IntegrationTests xUnit — só placeholder; referencia a Api
-├── docs/adr/0001-monorepo.md
+├── docs/adr/                     0001 a 0006
 ├── docker-compose.yml            postgres:15 + rabbitmq:3-management
 ├── .env.example · .editorconfig · .gitattributes · .github/workflows/ci.yml
 ```
-Referências entre projetos: Application → Domain · Infrastructure → Application · Api → Application, Infrastructure, Contracts · Worker → Infrastructure, Contracts · Web → nenhuma · UnitTests → Domain, Application · IntegrationTests → Api.
+Referências entre projetos: UnitTests → Api · IntegrationTests → Api · Web → nenhuma (fala com a API por HTTP).
 
-Por que projetos separados (e não pastas na Api): o Worker (previsto) é outro executável que precisa do banco (`Infrastructure`) e dos eventos (`Contracts`) sem carregar a Api inteira; e, como projeto, o `Domain` não consegue referenciar EF Core nem ASP.NET (o compilador impõe a regra de dependência). A `Application` tem pouco conteúdo hoje (ADR 0003); se os casos de uso do Worker e dos pedidos não a encorparem, reavaliar a fusão com o `Domain`.
+Por que um projeto só (ADR 0006): a divisão em Domain/Application/Infrastructure/Contracts/Worker foi montada antes de existir código para ela (a `Application` tinha 3 arquivos; o `Contracts` e o Worker estavam vazios). Quando o Worker for implementado, `Domain/` e `Infrastructure/` voltam a ser projetos (o Worker precisa do banco e dos eventos sem carregar a Api) e nasce o `Contracts`. Por isso as pastas mantêm as fronteiras: `Infrastructure/` só tem persistência e `Domain/` não conhece EF Core nem ASP.NET.
 
 ## 4. Modelo de dados (PostgreSQL, snake_case)
 | Tabela | Campos principais | Regras |
@@ -62,7 +61,7 @@ Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo
 
 ## 6. Estado atual (o que existe × o que falta)
 **Pronto**
-- Estrutura da solução e referências entre projetos.
+- Estrutura da solução (backend em projeto único, ADR 0006).
 - Entidades de domínio, `AppDbContext`, configurações Fluent API e migration inicial.
 - Infra local via Docker (Postgres + RabbitMQ com healthchecks).
 - CI de build/test; `.editorconfig`/`.gitattributes`; ADR do monorepo.
@@ -73,8 +72,8 @@ Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo
 - **Produtos** (mini ERP, ADR 0004): `ProductsController` (`/api/products`: listar com busca e paginação, obter, criar, editar, excluir; 404 para produto de outro usuário, 409 ao excluir produto já vendido) e telas `/produtos`, `/produtos/novo`, `/produtos/{id}/editar`. Ainda sem testes automatizados.
 
 **Ainda não existe**
-- Controllers/endpoints de clientes e pedidos; casos de uso na Application (os controllers falam direto com o `AppDbContext`, como no auth).
-- Publicação de eventos e consumo no Worker; `Contracts` vazio; nenhum pacote de RabbitMQ referenciado.
+- Controllers/endpoints de clientes e pedidos; os controllers falam direto com o `AppDbContext`, como no auth.
+- Worker e `Contracts` (removidos por enquanto, ADR 0006); publicação/consumo de eventos; nenhum pacote de RabbitMQ referenciado.
 - Dockerfiles e serviços `api`/`worker`/`web` no compose (estão comentados).
 - Testes reais (apenas `UnitTest1` vazio) — a CI passa, mas sem cobertura.
 - Testes do auth: os unitários do `AuthService` foram removidos junto com o serviço (ADR 0003); falta cobrir `/api/auth/*` com testes de integração.
@@ -86,7 +85,7 @@ Observação: `Order.TotalAmount` é um campo armazenado — a regra de cálculo
 - [ ] **v0.3** — Front-end Blazor
 
 ### Próximos passos naturais
-1. **v0.1**: repositórios/serviços em Application; endpoints de produtos, clientes e pedidos; criação de pedido (valida estoque, copia `UnitPrice`, calcula `TotalAmount`, baixa estoque numa transação); registro/login com JWT; Swagger UI; ProblemDetails; testes unitários do domínio e de integração (Testcontainers + Postgres é uma boa opção).
+1. **v0.1**: serviços só onde houver regra reaproveitada (ADR 0003); endpoints de produtos, clientes e pedidos; criação de pedido (valida estoque, copia `UnitPrice`, calcula `TotalAmount`, baixa estoque numa transação); registro/login com JWT; Swagger UI; ProblemDetails; testes unitários do domínio e de integração (Testcontainers + Postgres é uma boa opção).
 2. **v0.2**: definir eventos em `Contracts` (ex.: `OrderCreated`, `OrderConfirmed`), publicar a partir da API (considerar Outbox para consistência com o banco) e consumir no Worker (idempotência, retry, dead-letter).
 3. **v0.3**: Blazor consumindo a API (login, catálogo, carrinho/pedido, painel admin).
 4. Containerizar `api`, `worker` e `web` e ativar os blocos do compose (lembrar de `ConnectionStrings__Default` apontando para `postgres`).
@@ -98,13 +97,10 @@ Initial commit → estrutura inicial de pastas → remoção dos `Class1.cs` de 
 - `Customer.cs` usa tabs misturados com espaços (contraria o `.editorconfig`) e declara propriedades `required` **com** valor padrão `string.Empty` (redundante; o `required` perde o efeito).
 - `Order.TotalAmount` e `Product.StockQuantity` sem invariantes: entidades são anêmicas (setters públicos). Avaliar encapsular regras no domínio (ex.: `Order.AddItem`, `Order.Confirm/Cancel`, validação de transição de status).
 - Sem índices em `orders.customer_id`/`status` e `order_items.order_id/product_id` além dos criados por convenção do EF para FKs — revisar conforme consultas reais.
-- O `Program.cs` do Worker ainda é template. No Web, `Counter`/`Weather` foram removidos.
+- No Web, `Counter`/`Weather` foram removidos.
 - Autenticação sem refresh token, sem bloqueio por tentativas e sem confirmação de e-mail (ver ADR 0002).
-- Código de autenticação (e a simplificação do ADR 0003) escrito sem `dotnet build`/`dotnet test` no ambiente (SDK indisponível): rodar ambos antes de commitar.
-- `.csproj` de Application/Domain/Infrastructure/Contracts e os `UnitTest1.cs` têm BOM UTF-8; `.editorconfig` define `charset = utf-8` (sem BOM). Padronizar.
+- Os `UnitTest1.cs` têm BOM UTF-8; `.editorconfig` define `charset = utf-8` (sem BOM). Padronizar.
 - `StartupExtensions` está definido dentro de `Program.cs` da API; ao crescer, mover para arquivos próprios (`Common/` ou na pasta da feature em `Features/`).
-- A reestruturação por feature (ADR 0005) foi feita sem `dotnet build` (SDK indisponível): rodar build e testes antes do merge.
-- Não consegui rodar `dotnet build`/`dotnet test` ao montar estes documentos (SDK indisponível no ambiente), então o estado de build é inferido da leitura do código.
 
 ## 10. Glossário
 - **Customer**: cliente (pessoa/empresa que compra). **User**: credencial de acesso, pode estar ligada a um Customer. **Order**: pedido. **OrderItem**: linha do pedido, com preço congelado. **ADR**: Architecture Decision Record, em `docs/adr`.
