@@ -1,0 +1,189 @@
+@inject CustomerApiClient Customers
+@inject NavigationManager Navigation
+
+<header class="page-header page-header-row">
+    <div>
+        <h1 class="page-title">Clientes</h1>
+        <p class="page-subtitle">Quem compra de você, com os dados de contato.</p>
+    </div>
+    <a class="btn btn-brand" href="clientes/novo">Novo cliente</a>
+</header>
+
+<form class="toolbar" role="search" @onsubmit="SearchAsync">
+    <input type="search" class="form-control" placeholder="Buscar por nome ou e-mail" aria-label="Buscar clientes por nome ou e-mail" @bind="_searchInput" @bind:event="oninput" />
+    <button type="submit" class="btn btn-ghost" disabled="@_loading">Buscar</button>
+    @if (!string.IsNullOrEmpty(_search))
+    {
+        <button type="button" class="btn btn-ghost" disabled="@_loading" @onclick="ClearSearchAsync">Limpar</button>
+    }
+</form>
+
+@if (_error is not null)
+{
+    <div class="alert alert-danger" role="alert">@_error</div>
+}
+
+@if (_loading && _result is null)
+{
+    <div class="card-panel" aria-busy="true">
+        <div class="skeleton skeleton-line w-50"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line w-75"></div>
+    </div>
+}
+else if (_result is { TotalCount: 0 })
+{
+    <div class="card-panel empty-panel">
+        @if (string.IsNullOrEmpty(_search))
+        {
+            <h2>Nenhum cliente cadastrado</h2>
+            <p>Cadastre o primeiro cliente para poder registrar pedidos para ele.</p>
+            <a class="btn btn-brand" href="clientes/novo">Cadastrar cliente</a>
+        }
+        else
+        {
+            <h2>Nada encontrado</h2>
+            <p>Nenhum cliente corresponde a "@_search".</p>
+        }
+    </div>
+}
+else if (_result is not null)
+{
+    <div class="card-panel table-wrap" aria-busy="@(_loading ? "true" : "false")">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Telefone</th>
+                    <th><span class="visually-hidden">Ações</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var customer in _result.Items)
+                {
+                    <tr>
+                        <td>
+                            <span class="cell-title">@customer.Name</span>
+                            <span class="cell-sub">@customer.Email</span>
+                        </td>
+                        <td>@(string.IsNullOrEmpty(customer.Phone) ? "—" : customer.Phone)</td>
+                        <td>
+                            <div class="row-actions">
+                                <a class="btn btn-ghost btn-sm" href="clientes/@customer.Id/editar">Editar</a>
+                                <button type="button" class="btn btn-outline-danger btn-sm" @onclick="() => AskDelete(customer)">Excluir</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <Pager Page="_result.Page" TotalPages="_result.TotalPages" Disabled="_loading" OnPageChanged="GoToPageAsync" />
+}
+
+<ConfirmDialog Visible="_pendingDelete is not null"
+               Title="Excluir cliente"
+               Message="@DeleteMessage"
+               ConfirmText="Excluir"
+               Busy="_deleting"
+               OnConfirm="DeleteAsync"
+               OnCancel="CancelDelete" />
+
+@code {
+    private const int PageSize = 10;
+
+    private PagedResult<CustomerInfo>? _result;
+    private CustomerInfo? _pendingDelete;
+    private string _searchInput = string.Empty;
+    private string _search = string.Empty;
+    private int _page = 1;
+    private bool _loading = true;
+    private bool _deleting;
+    private string? _error;
+
+    private string DeleteMessage => $"Excluir \"{_pendingDelete?.Name}\"? Esta ação não pode ser desfeita.";
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        _error = null;
+
+        var result = await Customers.ListAsync(_search, _page, PageSize);
+
+        if (result.IsUnauthorized)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        if (result.Succeeded)
+            _result = result.Value;
+        else
+            _error = result.Error;
+
+        _loading = false;
+    }
+
+    private Task SearchAsync()
+    {
+        _search = _searchInput.Trim();
+        _page = 1;
+
+        return LoadAsync();
+    }
+
+    private Task ClearSearchAsync()
+    {
+        _searchInput = string.Empty;
+
+        return SearchAsync();
+    }
+
+    private Task GoToPageAsync(int page)
+    {
+        _page = page;
+
+        return LoadAsync();
+    }
+
+    private void AskDelete(CustomerInfo customer) => _pendingDelete = customer;
+
+    private void CancelDelete() => _pendingDelete = null;
+
+    private async Task DeleteAsync()
+    {
+        if (_pendingDelete is null)
+            return;
+
+        _deleting = true;
+
+        var result = await Customers.DeleteAsync(_pendingDelete.Id);
+
+        _deleting = false;
+        _pendingDelete = null;
+
+        if (result.IsUnauthorized)
+        {
+            RedirectToLogin();
+            return;
+        }
+
+        if (!result.Succeeded)
+        {
+            _error = result.Error;
+            return;
+        }
+
+        // Se era o último item da página, volta uma página.
+        if (_result is { Items.Count: 1 } && _page > 1)
+            _page--;
+
+        await LoadAsync();
+    }
+
+    private void RedirectToLogin() =>
+        Navigation.NavigateTo("login?returnUrl=%2Fclientes", replace: true);
+}

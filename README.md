@@ -16,7 +16,7 @@ Blazor Web  ──HTTP/JWT──▶  API  ──▶  PostgreSQL
 
 | Pasta | Descrição |
 |---|---|
-| `src/OrderFlow.Api` | ASP.NET Core Web API: `Features/` (Auth, Products), `Domain/` (entidades), `Infrastructure/` (EF Core e migrations), `Common/` |
+| `src/OrderFlow.Api` | ASP.NET Core Web API: `Features/` (Auth, Products, Customers), `Domain/` (entidades), `Infrastructure/` (EF Core e migrations), `Common/` |
 | `src/OrderFlow.Web` | Front-end Blazor |
 | `tests/` | Testes unitários e de integração |
 | `docs/` | Diagramas e ADRs (decisões de arquitetura) |

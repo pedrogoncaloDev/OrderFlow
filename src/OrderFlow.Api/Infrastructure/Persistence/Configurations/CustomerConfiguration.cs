@@ -15,6 +15,18 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.Property(c => c.Name).IsRequired().HasMaxLength(200);
         builder.Property(c => c.Email).IsRequired().HasMaxLength(320);
-        builder.HasIndex(c => c.Email).IsUnique();
+        builder.Property(c => c.Phone).HasMaxLength(30);
+
+        // Dono do cadastro. Restrict: um usuário com clientes não pode ser apagado por acidente.
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(c => c.OwnerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // O mesmo e-mail pode existir para donos diferentes, mas não duas vezes para o mesmo dono.
+        builder.HasIndex(c => new { c.OwnerId, c.Email }).IsUnique();
+
+        // A listagem é sempre "os clientes do dono, por nome".
+        builder.HasIndex(c => new { c.OwnerId, c.Name });
     }
 }

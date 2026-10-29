@@ -50,7 +50,7 @@ dotnet ef database update --project src/OrderFlow.Api
 Hoje o backend é **um projeto só** (ADR 0006); o `OrderFlow.Web` é um aplicativo à parte que fala com a API por HTTP.
 ```
 OrderFlow.Api/
-  Features/        Auth/, Products/            controller, requests, responses, extensions (ADR 0005)
+  Features/        Auth/, Products/, Customers/   controller, requests, responses, extensions (ADR 0005)
   Domain/          Entities/, Enums/           sem EF Core, sem ASP.NET (disciplina, não compilador)
   Infrastructure/  Persistence/, Migrations/   AppDbContext e Configurations (Fluent API)
   Common/                                      usado por mais de uma feature
@@ -62,7 +62,7 @@ OrderFlow.Api/
 - Dependência: `Features` → `Domain` e `Infrastructure`; `Infrastructure` → `Domain`; `Domain` não depende de ninguém. Mantenha assim: quando o Worker chegar, `Domain/` e `Infrastructure/` viram projetos de novo (e nasce o `Contracts`).
 
 ## Convenções
-- **Organização por feature** (ADR 0005): em `OrderFlow.Api` e `OrderFlow.Web`, cada recurso tem a própria pasta em `Features/` (`Features/Auth/`, `Features/Products/`) com controller/página, requests, responses, extensions e cliente HTTP juntos; o que é de mais de uma feature fica em `Common/`, ao lado de `Features/`. Namespace = pasta (`OrderFlow.Api.Features.Products`). Recurso novo → pasta nova em `Features/`. Dentro da Api, `Domain/` e `Infrastructure/` são pastas por camada, ao lado de `Features/`.
+- **Organização por feature** (ADR 0005): em `OrderFlow.Api` e `OrderFlow.Web`, cada recurso tem a própria pasta em `Features/` (`Features/Auth/`, `Features/Products/`, `Features/Customers/`) com controller/página, requests, responses, extensions e cliente HTTP juntos; o que é de mais de uma feature fica em `Common/`, ao lado de `Features/`. Namespace = pasta (`OrderFlow.Api.Features.Products`). Recurso novo → pasta nova em `Features/`. Dentro da Api, `Domain/` e `Infrastructure/` são pastas por camada, ao lado de `Features/`.
 - **Idioma**: commits, comentários, mensagens de erro e documentação em **português (pt-BR)**; identificadores de código em inglês.
 - **Commits**: Conventional Commits em português — `feat:`, `fix:`, `test:`, `refactor:`, `docs:`, `chore:`.
 - **Commits são do usuário**: o Claude **não faz commits** (nem `git commit`, nem `--amend`, nem push). No máximo, ao terminar uma tarefa, sugere a mensagem de commit (Conventional Commits em pt-BR) para o usuário commitar. Pode usar `git add`/`git mv` e criar branch quando pedido.
@@ -81,7 +81,7 @@ OrderFlow.Api/
 - Defina `Role` no servidor; nunca aceite `Role` vinda do cliente no cadastro.
 
 ## Armadilhas conhecidas (detalhes em CONTEXT.md)
-- Existem o `AuthController` e o `ProductsController`; os de clientes e pedidos ainda não. Cadastros são **isolados por dono** (ADR 0004): todo acesso filtra por `owner_id` (do claim `sub`, nunca do corpo) e registro de outro usuário responde 404.
+- Existem o `AuthController`, o `ProductsController` e o `CustomersController`; o de pedidos ainda não. Cadastros são **isolados por dono** (ADR 0004): todo acesso filtra por `owner_id` (do claim `sub`, nunca do corpo) e registro de outro usuário responde 404.
 - O cliente HTTP do Web que herda de `AuthorizedApiClient` é registrado sozinho (`AddApiClients`); para um módulo novo basta criar a classe.
 - O auth não tem camadas intermediárias (ADR 0003): a lógica está no `AuthController` com o `AppDbContext`, e os corpos (`RegisterRequest`, `LoginRequest` etc.) ficam em arquivos próprios em `Features/Auth/`. Não há testes do auth até existirem testes de integração. Em recursos novos, decida caso a caso se vale extrair um serviço.
 - A chave do JWT vem de `Jwt__Key` (`.env`). Em Development, se vazia, a API gera uma chave temporária (sessões caem ao reiniciar); fora dele, a API não sobe sem a chave.

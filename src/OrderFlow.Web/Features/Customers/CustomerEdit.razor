@@ -1,0 +1,11 @@
+@page "/clientes/{Id:guid}/editar"
+
+<PageTitle>Editar cliente · OrderFlow</PageTitle>
+
+<RequireAuth>
+    <CustomerForm CustomerId="Id" />
+</RequireAuth>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+}
