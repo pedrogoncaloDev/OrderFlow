@@ -2,8 +2,6 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using OrderFlow.Application.Auth;
-using OrderFlow.Infrastructure.Auth;
 
 namespace OrderFlow.Api.Features.Auth;
 

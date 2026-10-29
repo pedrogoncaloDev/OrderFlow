@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using OrderFlow.Application.Auth;
+using OrderFlow.Api.Features.Auth;
 
 namespace OrderFlow.Api.Common;
 

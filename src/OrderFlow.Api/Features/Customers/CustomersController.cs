@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using OrderFlow.Api.Common;
-using OrderFlow.Application.Auth;
-using OrderFlow.Domain.Entities;
-using OrderFlow.Infrastructure.Persistence;
+using OrderFlow.Api.Features.Auth;
+using OrderFlow.Api.Domain.Entities;
+using OrderFlow.Api.Infrastructure.Persistence;
 
 namespace OrderFlow.Api.Features.Customers;
 

@@ -1,4 +1,4 @@
-using OrderFlow.Domain.Entities;
+using OrderFlow.Api.Domain.Entities;
 
 namespace OrderFlow.Api.Features.Auth;
 

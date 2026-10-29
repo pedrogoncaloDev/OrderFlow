@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -19,8 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\OrderFlow.Domain\OrderFlow.Domain.csproj" />
-    <ProjectReference Include="..\..\src\OrderFlow.Application\OrderFlow.Application.csproj" />
+    <ProjectReference Include="..\..\src\OrderFlow.Api\OrderFlow.Api.csproj" />
   </ItemGroup>
 
 </Project>
